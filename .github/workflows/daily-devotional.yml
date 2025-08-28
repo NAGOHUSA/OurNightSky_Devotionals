@@ -1,0 +1,42 @@
+name: Generate Daily Devotional
+
+on:
+  schedule:
+    # Runs at 2 AM UTC every day (adjust timezone as needed)
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allows manual running for testing
+
+jobs:
+  generate-devotional:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Install dependencies
+      run: |
+        npm init -y
+        npm install axios
+        
+    - name: Generate devotional
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      run: node generate-devotional.js
+        
+    - name: Commit and push devotional
+      run: |
+        git config --local user.email "github-actions@github.com"
+        git config --local user.name "GitHub Actions"
+        git add devotionals/
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Daily devotional for $(date +%Y-%m-%d)"
+          git push
+        fi
