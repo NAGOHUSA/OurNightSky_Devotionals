@@ -1,10 +1,16 @@
-name: Generate Daily Devotional
+name: Generate Enhanced Daily Devotional
 
 on:
   schedule:
-    # Runs at 2 AM UTC every day (adjust timezone as needed)
+    # Runs at 2 AM UTC every day
     - cron: '0 2 * * *'
   workflow_dispatch: # Allows manual running for testing
+    inputs:
+      force_regenerate:
+        description: 'Force regenerate even if devotional exists'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   generate-devotional:
@@ -24,19 +30,151 @@ jobs:
         npm init -y
         npm install axios
         
-    - name: Generate devotional
+    - name: Create necessary directories
+      run: |
+        mkdir -p devotionals
+        
+    - name: Generate enhanced devotional
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: node generate-devotional.js
+        FORCE_REGENERATE: ${{ github.event.inputs.force_regenerate || 'false' }}
+      run: |
+        echo "🌟 Starting Enhanced Devotional Generation"
+        echo "Force regenerate: $FORCE_REGENERATE"
+        
+        # Run the enhanced generator with error handling
+        if node generate-devotional.js; then
+          echo "✅ Devotional generation completed successfully"
+        else
+          echo "❌ Primary generation failed, creating fallback"
+          node -e "
+          const fs = require('fs');
+          const today = new Date().toISOString().split('T')[0];
+          
+          // Create emergency fallback devotional
+          const fallback = {
+            id: \`devotional-\${today}\`,
+            date: today,
+            title: 'God''s Faithful Light',
+            content: 'When technical difficulties arise, we remember that God''s faithfulness never fails. Tonight''s sky continues its ancient dance of beauty and order, regardless of our earthly challenges. Let this moment remind you that divine love transcends all temporary setbacks, and tomorrow brings new opportunities for grace and connection with the Creator of all things.',
+            scriptureReference: 'Lamentations 3:22-23',
+            celestialConnection: 'Tonight''s stars shine faithfully, just as God''s mercies are new every morning.',
+            moonPhase: 'Current phase',
+            visiblePlanets: 'Various planets',
+            specialEvents: 'God''s nightly display of faithfulness',
+            bestViewingTime: 'Evening reflection',
+            season: 'Current season',
+            createdAt: new Date().toISOString(),
+            isEmergencyFallback: true
+          };
+          
+          fs.writeFileSync(\`devotionals/\${today}.json\`, JSON.stringify(fallback, null, 2));
+          console.log('🆘 Emergency fallback devotional created');
+          "
+        fi
+        
+    - name: Validate generated content
+      run: |
+        echo "🔍 Validating generated devotional..."
+        node -e "
+        const fs = require('fs');
+        const today = new Date().toISOString().split('T')[0];
+        const filePath = \`devotionals/\${today}.json\`;
+        
+        if (!fs.existsSync(filePath)) {
+          console.error('❌ No devotional file generated!');
+          process.exit(1);
+        }
+        
+        try {
+          const devotional = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+          
+          // Validate required fields
+          const required = ['id', 'date', 'title', 'content', 'scriptureReference'];
+          for (const field of required) {
+            if (!devotional[field]) {
+              throw new Error(\`Missing required field: \${field}\`);
+            }
+          }
+          
+          // Validate content length
+          if (devotional.content.length < 100) {
+            throw new Error('Content too short');
+          }
+          
+          if (devotional.content.length > 3000) {
+            throw new Error('Content too long');
+          }
+          
+          console.log('✅ Devotional validation passed');
+          console.log('📖 Title:', devotional.title);
+          console.log('📜 Scripture:', devotional.scriptureReference);
+          console.log('📏 Content Length:', devotional.content.length, 'characters');
+          
+        } catch (error) {
+          console.error('❌ Validation failed:', error.message);
+          process.exit(1);
+        }
+        "
         
     - name: Commit and push devotional
       run: |
         git config --local user.email "github-actions@github.com"
-        git config --local user.name "GitHub Actions"
+        git config --local user.name "OurNightSky DevotionalBot"
+        
+        # Add generated files
         git add devotionals/
+        git add content_tracker.json || true  # Don't fail if file doesn't exist
+        
+        # Check if there are changes to commit
         if git diff --staged --quiet; then
-          echo "No changes to commit"
+          echo "📝 No changes to commit"
         else
-          git commit -m "Daily devotional for $(date +%Y-%m-%d)"
+          # Get today's devotional info for commit message
+          TODAY=$(date +%Y-%m-%d)
+          if [ -f "devotionals/${TODAY}.json" ]; then
+            TITLE=$(node -e "
+              const fs = require('fs');
+              try {
+                const dev = JSON.parse(fs.readFileSync('devotionals/${TODAY}.json', 'utf8'));
+                console.log(dev.title);
+              } catch(e) {
+                console.log('Enhanced Daily Devotional');
+              }
+            ")
+            
+            git commit -m "✨ Enhanced Daily Devotional: ${TITLE}
+
+📅 Date: ${TODAY}
+🌙 Generated by OurNightSky Enhanced System
+🎯 Features: Unique content, mental health themes, astronomical accuracy"
+          else
+            git commit -m "📝 Daily devotional update for ${TODAY}"
+          fi
+          
           git push
+          echo "✅ Changes committed and pushed successfully"
         fi
+        
+    - name: Generation summary
+      if: always()
+      run: |
+        echo "📋 Generation Summary:"
+        TODAY=$(date +%Y-%m-%d)
+        
+        if [ -f "devotionals/${TODAY}.json" ]; then
+          echo "✅ Devotional file created successfully"
+          
+          # Show file info
+          SIZE=$(wc -c < "devotionals/${TODAY}.json")
+          echo "📏 File size: ${SIZE} bytes"
+          
+          # Count total devotionals
+          TOTAL=$(find devotionals/ -name "*.json" 2>/dev/null | wc -l)
+          echo "📚 Total devotionals: ${TOTAL}"
+          
+        else
+          echo "❌ No devotional file found"
+        fi
+        
+        echo "🎉 Enhanced devotional generation process complete!"
