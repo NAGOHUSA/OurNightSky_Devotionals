@@ -46,29 +46,28 @@ jobs:
         if node generate-devotional.js; then
           echo "✅ Devotional generation completed successfully"
         else
-          echo "❌ Primary generation failed, creating fallback"
+          echo "❌ Primary generation failed, creating emergency fallback"
           node -e "
           const fs = require('fs');
           const today = new Date().toISOString().split('T')[0];
           
-          // Create emergency fallback devotional
           const fallback = {
-            id: \`devotional-\${today}\`,
+            id: 'devotional-' + today,
             date: today,
-            title: 'God''s Faithful Light',
-            content: 'When technical difficulties arise, we remember that God''s faithfulness never fails. Tonight''s sky continues its ancient dance of beauty and order, regardless of our earthly challenges. Let this moment remind you that divine love transcends all temporary setbacks, and tomorrow brings new opportunities for grace and connection with the Creator of all things.',
+            title: 'God\'s Faithful Light',
+            content: 'When technical difficulties arise, we remember that God\'s faithfulness never fails. Tonight\'s sky continues its ancient dance of beauty and order, regardless of our earthly challenges. Let this moment remind you that divine love transcends all temporary setbacks, and tomorrow brings new opportunities for grace and connection with the Creator of all things.',
             scriptureReference: 'Lamentations 3:22-23',
-            celestialConnection: 'Tonight''s stars shine faithfully, just as God''s mercies are new every morning.',
+            celestialConnection: 'Tonight\'s stars shine faithfully, just as God\'s mercies are new every morning.',
             moonPhase: 'Current phase',
             visiblePlanets: 'Various planets',
-            specialEvents: 'God''s nightly display of faithfulness',
+            specialEvents: 'God\'s nightly display of faithfulness',
             bestViewingTime: 'Evening reflection',
             season: 'Current season',
             createdAt: new Date().toISOString(),
             isEmergencyFallback: true
           };
           
-          fs.writeFileSync(\`devotionals/\${today}.json\`, JSON.stringify(fallback, null, 2));
+          fs.writeFileSync('devotionals/' + today + '.json', JSON.stringify(fallback, null, 2));
           console.log('🆘 Emergency fallback devotional created');
           "
         fi
@@ -79,7 +78,7 @@ jobs:
         node -e "
         const fs = require('fs');
         const today = new Date().toISOString().split('T')[0];
-        const filePath = \`devotionals/\${today}.json\`;
+        const filePath = 'devotionals/' + today + '.json';
         
         if (!fs.existsSync(filePath)) {
           console.error('❌ No devotional file generated!');
@@ -89,15 +88,13 @@ jobs:
         try {
           const devotional = JSON.parse(fs.readFileSync(filePath, 'utf8'));
           
-          // Validate required fields
           const required = ['id', 'date', 'title', 'content', 'scriptureReference'];
           for (const field of required) {
             if (!devotional[field]) {
-              throw new Error(\`Missing required field: \${field}\`);
+              throw new Error('Missing required field: ' + field);
             }
           }
           
-          // Validate content length
           if (devotional.content.length < 100) {
             throw new Error('Content too short');
           }
@@ -122,15 +119,12 @@ jobs:
         git config --local user.email "github-actions@github.com"
         git config --local user.name "OurNightSky DevotionalBot"
         
-        # Add generated files
         git add devotionals/
-        git add content_tracker.json || true  # Don't fail if file doesn't exist
+        git add content_tracker.json || true
         
-        # Check if there are changes to commit
         if git diff --staged --quiet; then
           echo "📝 No changes to commit"
         else
-          # Get today's devotional info for commit message
           TODAY=$(date +%Y-%m-%d)
           if [ -f "devotionals/${TODAY}.json" ]; then
             TITLE=$(node -e "
@@ -165,11 +159,9 @@ jobs:
         if [ -f "devotionals/${TODAY}.json" ]; then
           echo "✅ Devotional file created successfully"
           
-          # Show file info
           SIZE=$(wc -c < "devotionals/${TODAY}.json")
           echo "📏 File size: ${SIZE} bytes"
           
-          # Count total devotionals
           TOTAL=$(find devotionals/ -name "*.json" 2>/dev/null | wc -l)
           echo "📚 Total devotionals: ${TOTAL}"
           
