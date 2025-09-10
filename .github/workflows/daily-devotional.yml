@@ -2,8 +2,8 @@ name: Generate Enhanced Daily Devotional
 
 on:
   schedule:
-    # Runs at 2 AM UTC every day
-    - cron: '0 2 * * *'
+    # Runs at 7 PM EST every day
+    - cron: '0 0 * * *'
   workflow_dispatch: # Allows manual running for testing
     inputs:
       force_regenerate:
