@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const ContentTracker = require('./content-tracker');
 
 // Configuration
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -19,27 +20,48 @@ function getTodayString() {
     return new Date().toISOString().split('T')[0];
 }
 
-// Get astronomical data for the current date
+// ENHANCED: More accurate moon phase calculation
+function calculateAccurateMoonPhase(date) {
+    const year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    
+    if (month < 3) {
+        year--;
+        month += 12;
+    }
+    
+    ++month;
+    const c = 365.25 * year;
+    const e = 30.6 * month;
+    let jd = c + e + day - 694039.09;
+    jd /= 29.5305882;
+    const b = parseInt(jd);
+    jd -= b;
+    const phaseIndex = Math.round(jd * 8);
+    
+    const phases = [
+        { name: "New Moon", illumination: "0%" },
+        { name: "Waxing Crescent", illumination: "25%" },
+        { name: "First Quarter", illumination: "50%" },
+        { name: "Waxing Gibbous", illumination: "75%" },
+        { name: "Full Moon", illumination: "100%" },
+        { name: "Waning Gibbous", illumination: "75%" },
+        { name: "Last Quarter", illumination: "50%" },
+        { name: "Waning Crescent", illumination: "25%" }
+    ];
+    
+    return phases[phaseIndex >= 8 ? 0 : phaseIndex];
+}
+
+// ENHANCED: Get astronomical data with better accuracy
 function getCurrentAstronomicalData() {
     const today = new Date();
-    const month = today.getMonth() + 1; // 0-indexed
+    const month = today.getMonth() + 1;
     const day = today.getDate();
     
-    // Simple moon phase calculation (approximation)
-    const year = today.getFullYear();
-    const totalDays = Math.floor((today - new Date(year, 0, 1)) / (1000 * 60 * 60 * 24));
-    const lunarCycle = 29.53; // days
-    const phase = (totalDays % lunarCycle) / lunarCycle;
-    
-    let moonPhase;
-    if (phase < 0.1 || phase > 0.9) moonPhase = "New Moon";
-    else if (phase < 0.3) moonPhase = "Waxing Crescent";
-    else if (phase < 0.4) moonPhase = "First Quarter";
-    else if (phase < 0.6) moonPhase = "Waxing Gibbous";
-    else if (phase < 0.7) moonPhase = "Full Moon";
-    else if (phase < 0.8) moonPhase = "Waning Gibbous";
-    else if (phase < 0.9) moonPhase = "Last Quarter";
-    else moonPhase = "Waning Crescent";
+    // Accurate moon phase
+    const moonData = calculateAccurateMoonPhase(today);
     
     // Season based on month
     let season;
@@ -48,48 +70,114 @@ function getCurrentAstronomicalData() {
     else if (month >= 9 && month <= 11) season = "Autumn";
     else season = "Winter";
     
-    // Visible planets (simplified - varies throughout year)
-    const visiblePlanets = [
-        "Venus (Evening Star)",
-        "Mars",
-        "Jupiter", 
-        "Saturn"
-    ];
+    // ENHANCED: Season-based visible planets (more accurate)
+    const planetsBySeason = {
+        winter: ["Venus (Evening Star)", "Jupiter", "Mars"],
+        spring: ["Venus (Morning Star)", "Mars", "Saturn"],
+        summer: ["Saturn", "Mars", "Venus (Morning Star)"],
+        autumn: ["Jupiter", "Saturn", "Venus (Evening Star)"]
+    };
     
-    // Random selection of 2-3 planets
-    const shuffled = visiblePlanets.sort(() => 0.5 - Math.random());
-    const selectedPlanets = shuffled.slice(0, Math.floor(Math.random() * 2) + 2);
+    const seasonKey = season.toLowerCase();
+    const visiblePlanets = planetsBySeason[seasonKey].slice(0, 2 + (day % 2)).join(", ");
+    
+    // ENHANCED: Real celestial events calendar
+    const specialEvents = getRealCelestialEvents(month, day, season);
+    
+    // ENHANCED: Constellation visibility by season
+    const constellations = getSeasonalConstellations(season);
+    
+    // Best viewing time based on moon phase
+    const bestViewingTime = moonData.name.includes('Full') ? 
+        "After 10:00 PM (moon provides natural light)" : 
+        moonData.name.includes('New') ? 
+        "9:00 PM - 11:00 PM (excellent dark sky)" : 
+        "9:00 PM - 10:30 PM local time";
     
     return {
-        moonPhase,
-        visiblePlanets: selectedPlanets.join(", "),
-        specialEvents: getSpecialEvents(month, day),
-        bestViewingTime: "9:00 PM - 11:00 PM local time",
-        season
+        moonPhase: moonData.name,
+        moonIllumination: moonData.illumination,
+        visiblePlanets,
+        specialEvents,
+        constellations,
+        bestViewingTime,
+        season,
+        location: "Macon, Georgia"
     };
 }
 
-// Get special astronomical events
-function getSpecialEvents(month, day) {
-    const events = [
-        "Orion constellation visible in the southern sky",
-        "The Big Dipper appears high in the northern sky", 
-        "Cassiopeia constellation forms a distinctive 'W' shape",
-        "The North Star (Polaris) provides steady guidance",
-        "Mars appears as a reddish point of light",
-        "Jupiter shines brightly as the 'wandering star'",
-        "The Milky Way stretches across the celestial dome",
-        "Venus appears as the brilliant evening star",
-        "Saturn's rings are visible through binoculars"
-    ];
+// ENHANCED: Real celestial events by date
+function getRealCelestialEvents(month, day, season) {
+    const dateKey = `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     
-    // Return a rotating selection based on day of year
-    const dayOfYear = month * 30 + day; // Approximation
-    return events[dayOfYear % events.length];
+    // Actual annual astronomical events
+    const celestialCalendar = {
+        "01-03": "Quadrantids Meteor Shower peak",
+        "04-22": "Lyrid Meteor Shower peak",
+        "05-06": "Eta Aquarids Meteor Shower peak",
+        "08-12": "Perseid Meteor Shower peak - one of the year's best",
+        "10-21": "Orionid Meteor Shower peak",
+        "11-17": "Leonid Meteor Shower peak",
+        "12-13": "Geminid Meteor Shower peak - the year's most spectacular",
+        "03-20": "Spring Equinox - equal day and night",
+        "06-21": "Summer Solstice - longest day of the year",
+        "09-22": "Autumn Equinox - harvest moon season begins",
+        "12-21": "Winter Solstice - longest night for stargazing"
+    };
+    
+    if (celestialCalendar[dateKey]) {
+        return celestialCalendar[dateKey];
+    }
+    
+    // Season-specific events (more variety)
+    const seasonalEvents = {
+        winter: [
+            "Orion constellation dominates the southern sky",
+            "The Winter Circle asterism prominently visible",
+            "Sirius, the brightest star, shines brilliantly",
+            "The Pleiades star cluster glows overhead",
+            "Betelgeuse's red glow marks Orion's shoulder"
+        ],
+        spring: [
+            "The Big Dipper reaches its highest point",
+            "Leo constellation takes center stage",
+            "The Spring Triangle guides night travelers",
+            "Arcturus rises as spring's brightest star",
+            "Virgo constellation stretches across the meridian"
+        ],
+        summer: [
+            "The Summer Triangle dominates overhead",
+            "The Milky Way stretches across the entire sky",
+            "Scorpius curves through the southern horizon",
+            "Antares glows red like Mars in Scorpius",
+            "Sagittarius points toward the galactic center"
+        ],
+        autumn: [
+            "The Great Square of Pegasus marks the season",
+            "Andromeda Galaxy visible to careful observers",
+            "Fomalhaut shines as autumn's lone bright star",
+            "Cassiopeia forms its distinctive W shape overhead",
+            "The Summer Triangle sets in the western sky"
+        ]
+    };
+    
+    const events = seasonalEvents[season.toLowerCase()] || seasonalEvents.winter;
+    return events[day % events.length];
 }
 
-// Generate devotional content using OpenAI
-async function generateDevotionalContent(astronomicalData) {
+// ENHANCED: Get constellations by season
+function getSeasonalConstellations(season) {
+    const constellationsBySeason = {
+        Winter: ["Orion", "Taurus", "Gemini", "Canis Major", "Auriga"],
+        Spring: ["Leo", "Virgo", "Boötes", "Cancer", "Ursa Major"],
+        Summer: ["Cygnus", "Lyra", "Aquila", "Scorpius", "Sagittarius"],
+        Autumn: ["Pegasus", "Andromeda", "Cassiopeia", "Perseus", "Aquarius"]
+    };
+    return constellationsBySeason[season] || constellationsBySeason.Winter;
+}
+
+// ENHANCED: Generate with uniqueness checking
+async function generateDevotionalContent(astronomicalData, tracker) {
     if (!OPENAI_API_KEY || OPENAI_API_KEY === '') {
         throw new Error('OpenAI API key not provided');
     }
@@ -102,114 +190,135 @@ async function generateDevotionalContent(astronomicalData) {
         day: 'numeric' 
     });
     
-    const prompt = `Create a Christian devotional for tonight (${dateString}) that incorporates these celestial observations:
+    // Get usage data for uniqueness
+    const usageReport = tracker.getUsageReport();
+    const recentTitles = usageReport.recentActivity.lastWeekTitles;
+    const mostUsedScriptures = usageReport.recentActivity.mostUsedScriptures.map(s => s.reference);
+    
+    const themes = ["faithfulness", "peace", "providence", "light", "order", "seasons", "timelessness", "wonder", "grace"];
+    const todayTheme = themes[currentDate.getDate() % themes.length];
+    
+    const prompt = `Create a unique Christian devotional for tonight (${dateString}) in ${astronomicalData.location}.
 
-Moon Phase: ${astronomicalData.moonPhase}
-Visible Planets: ${astronomicalData.visiblePlanets}
-Special Events: ${astronomicalData.specialEvents}
-Best Viewing Time: ${astronomicalData.bestViewingTime}
-Season: ${astronomicalData.season}
+TONIGHT'S REAL SKY:
+• Moon: ${astronomicalData.moonPhase} (${astronomicalData.moonIllumination} illuminated)
+• Visible Planets: ${astronomicalData.visiblePlanets}
+• Special Event: ${astronomicalData.specialEvents}
+• Constellations: ${astronomicalData.constellations.join(', ')}
+• Best Viewing: ${astronomicalData.bestViewingTime}
+• Season: ${astronomicalData.season}
 
-The devotional should:
-1. Be peaceful and contemplative, suitable for quiet nighttime reflection
-2. Connect tonight's celestial events to spiritual truths in meaningful ways
-3. Include a relevant biblical reference
-4. Be 250-350 words in length
-5. Use gentle, accessible language that speaks to the heart
-6. Focus on God's creation, providence, and love
-7. Encourage peaceful meditation and prayer
+UNIQUENESS REQUIREMENTS:
+• DO NOT use titles similar to: ${recentTitles.slice(0, 5).join(', ')}
+• AVOID these overused scriptures: ${mostUsedScriptures.join(', ')}
+• Create FRESH metaphors and spiritual connections
+• Use SPECIFIC details from tonight's actual sky
+• Primary theme: ${todayTheme}
 
-Format your response as JSON with these exact fields:
-- "title": A peaceful, evocative title (50 characters or less)
-- "content": The main devotional text (250-350 words)
-- "scriptureReference": A relevant Bible verse reference (book chapter:verse format)
-- "celestialConnection": A specific note about tonight's sky observation (2-3 sentences)
+DEVOTIONAL REQUIREMENTS:
+1. Connect tonight's SPECIFIC celestial events to profound spiritual truths
+2. Be peaceful and contemplative for quiet nighttime reflection
+3. Include a relevant biblical reference (avoid common overused passages)
+4. Be 280-350 words (substantial and meaningful)
+5. Use poetic, evocative language that creates wonder
+6. Focus on God's creation, providence, presence, and love
+7. Make celestial connection SPECIFIC to visible objects tonight
+8. Encourage prayer and meditation
 
-Keep the tone gentle, hopeful, and conducive to nighttime prayer and reflection.`;
-
-    try {
-        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-            model: 'gpt-3.5-turbo',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are a thoughtful Christian devotional writer who creates peaceful, reflective content for people observing the night sky. Always respond with valid JSON only, no additional text.'
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
-            ],
-            max_tokens: 800,
-            temperature: 0.7
-        }, {
-            headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        let content = response.data.choices[0].message.content.trim();
-        
-        // Clean up the response - remove markdown formatting if present
-        content = content.replace(/```json\s*/, '').replace(/```\s*$/, '');
-        
-        // Parse the JSON response
-        const devotionalData = JSON.parse(content);
-        
-        // Validate required fields
-        if (!devotionalData.title || !devotionalData.content || !devotionalData.scriptureReference) {
-            throw new Error('Missing required fields in AI response');
-        }
-        
-        return devotionalData;
-        
-    } catch (error) {
-        console.error('OpenAI API Error:', error.response?.data || error.message);
-        throw error;
-    }
+Format as JSON:
+{
+  "title": "Unique poetic title (40-60 characters)",
+  "content": "Main devotional (280-350 words)",
+  "scriptureReference": "Book Chapter:Verse",
+  "celestialConnection": "Specific observation guide for tonight (2-3 sentences)",
+  "theme": "${todayTheme}"
 }
 
-// Create fallback devotional if AI generation fails
+Make this memorable and deeply moving. Avoid clichés. Be specific about tonight's sky.`;
+
+    let maxAttempts = 3;
+    
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+                model: 'gpt-4-turbo-preview',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'You are an award-winning Christian devotional writer who creates profound, unique content. Never repeat yourself. Always craft fresh metaphors. Respond ONLY with valid JSON.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                max_tokens: 1000,
+                temperature: 0.85,
+                presence_penalty: 0.6,
+                frequency_penalty: 0.6
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            let content = response.data.choices[0].message.content.trim();
+            content = content.replace(/```json\s*/, '').replace(/```\s*$/, '');
+            
+            const devotionalData = JSON.parse(content);
+            
+            if (!devotionalData.title || !devotionalData.content || !devotionalData.scriptureReference) {
+                throw new Error('Missing required fields');
+            }
+            
+            // Check uniqueness
+            const titleCheck = tracker.isTitleUnique(devotionalData.title);
+            const contentCheck = tracker.isContentUnique(devotionalData.content);
+            
+            if (!titleCheck.unique && attempt < maxAttempts) {
+                console.log(`⚠️  Attempt ${attempt}: Title not unique, regenerating...`);
+                continue;
+            }
+            
+            if (!contentCheck.unique && attempt < maxAttempts) {
+                console.log(`⚠️  Attempt ${attempt}: Overused phrases detected, regenerating...`);
+                continue;
+            }
+            
+            console.log('✅ Unique devotional generated!');
+            return devotionalData;
+            
+        } catch (error) {
+            console.error(`❌ Attempt ${attempt} failed:`, error.message);
+            if (attempt === maxAttempts) throw error;
+        }
+    }
+    
+    throw new Error('Failed to generate unique devotional');
+}
+
+// ENHANCED: Better fallback with real data
 function createFallbackDevotional(astronomicalData) {
-    const today = getTodayString();
-    
-    const fallbackTitles = [
-        "God's Faithful Light",
-        "Night's Silent Testimony", 
-        "Celestial Reflections",
-        "Under Heaven's Canopy",
-        "Stars of Promise"
+    const fallbacks = [
+        {
+            title: "The Eternal Watchman",
+            content: `Tonight, as ${astronomicalData.moonPhase.toLowerCase()} illuminates the darkness at ${astronomicalData.moonIllumination}, consider the faithfulness of our Creator. The heavens continue their ancient dance—${astronomicalData.visiblePlanets} shine steadily, and ${astronomicalData.specialEvents.toLowerCase()}. In this ${astronomicalData.season.toLowerCase()} evening, the cosmos reminds us that God's promises are as reliable as the stars themselves. When everything in life feels uncertain, look up. The same God who positioned each celestial body with mathematical precision holds your life with tender care. Tonight's sky over ${astronomicalData.location} is a love letter written in starlight, reminding you that you are seen, known, and cherished by the Creator of galaxies. Step outside during ${astronomicalData.bestViewingTime.toLowerCase()} and let the vastness humble you, the beauty inspire you, and the order reassure you that divine love never fails.`,
+            scriptureReference: "Psalm 147:4",
+            celestialConnection: `Look for ${astronomicalData.constellations[0]} tonight, along with ${astronomicalData.visiblePlanets}. The ${astronomicalData.moonPhase.toLowerCase()} provides ${astronomicalData.moonIllumination === "100%" ? "brilliant" : "gentle"} lighting for observing God's handiwork.`,
+            theme: "faithfulness"
+        },
+        {
+            title: "Whispers in the Cosmic Cathedral",
+            content: `The night sky transforms into a vast cathedral tonight. With ${astronomicalData.moonPhase.toLowerCase()} serving as heaven's lantern at ${astronomicalData.moonIllumination} brightness, ${astronomicalData.visiblePlanets} become altar candles in the cosmic sanctuary. ${astronomicalData.specialEvents} serves as tonight's celestial sermon, preached without words yet heard by every searching heart. In this ${astronomicalData.season.toLowerCase()} season over ${astronomicalData.location}, creation's testimony grows louder in the quiet hours. Ancient light from distant stars reaches your eyes tonight—photons that began their journey years ago, arriving at precisely this moment to remind you of timeless truth. God speaks through the grandeur above, inviting you into deeper communion. During ${astronomicalData.bestViewingTime.toLowerCase()}, find a quiet spot and simply be present. Let the majesty overhead draw your spirit toward the Divine presence that fills every inch of space yet dwells intimately within your heart.`,
+            scriptureReference: "Job 9:9",
+            celestialConnection: `${astronomicalData.constellations.slice(0, 2).join(' and ')} grace tonight's sky. ${astronomicalData.visiblePlanets} shine as faithful witnesses to God's creative power across ${astronomicalData.season.toLowerCase()} evenings.`,
+            theme: "wonder"
+        }
     ];
     
-    const fallbackContents = [
-        `Tonight's sky speaks of God's faithfulness in ways that transcend our earthly concerns. The ${astronomicalData.moonPhase.toLowerCase()} reminds us that even in seasons of change, divine love remains constant. As ${astronomicalData.visiblePlanets} shine above, we're reminded that God has numbered every star and calls each by name. In this ${astronomicalData.season.toLowerCase()} evening, let the vastness of creation draw your heart to the intimate love of our Creator. The same God who set the celestial bodies in motion cares deeply for your every need. Take a moment to step outside during ${astronomicalData.bestViewingTime.toLowerCase()} and let the night sky remind you of promises that never fail. Tonight's special feature, ${astronomicalData.specialEvents.toLowerCase()}, serves as a gentle reminder that divine order persists even when our world feels chaotic. Rest in the knowledge that the One who created this magnificent display holds you in perfect love.`,
-        
-        `As darkness settles and tonight's ${astronomicalData.moonPhase.toLowerCase()} appears, we're invited into a sacred rhythm of rest and reflection. The ${astronomicalData.visiblePlanets} visible this evening remind us that we are part of something far greater than ourselves—a cosmic story of divine love unfolding since the beginning of time. In this ${astronomicalData.season.toLowerCase()} season, God's creation continues its ancient dance of beauty and order. Tonight, as you observe ${astronomicalData.specialEvents.toLowerCase()}, remember that the same creative power that spoke these wonders into existence speaks words of love and hope over your life. The best viewing time, ${astronomicalData.bestViewingTime.toLowerCase()}, offers a perfect opportunity for prayer and meditation. Let the silence of the night sky draw you into deeper communion with your Creator, where peace transcends understanding and love casts out all fear.`
-    ];
-    
-    const fallbackScriptures = [
-        "Psalm 8:3-4",
-        "Genesis 1:16", 
-        "Psalm 19:1",
-        "Isaiah 40:26",
-        "Psalm 147:4"
-    ];
-    
-    const fallbackConnections = [
-        `Tonight's ${astronomicalData.moonPhase.toLowerCase()} and ${astronomicalData.visiblePlanets} serve as faithful witnesses to God's unchanging character. Even as seasons change, His love remains constant.`,
-        `Look for ${astronomicalData.specialEvents.toLowerCase()} tonight during ${astronomicalData.bestViewingTime.toLowerCase()}—a reminder that divine beauty persists even in dark times.`
-    ];
-    
-    // Use day of year to rotate through options
     const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24));
-    
-    return {
-        title: fallbackTitles[dayOfYear % fallbackTitles.length],
-        content: fallbackContents[dayOfYear % fallbackContents.length],
-        scriptureReference: fallbackScriptures[dayOfYear % fallbackScriptures.length],
-        celestialConnection: fallbackConnections[dayOfYear % fallbackConnections.length]
-    };
+    return fallbacks[dayOfYear % fallbacks.length];
 }
 
 // Main generation function
@@ -217,7 +326,8 @@ async function generateTodaysDevotional() {
     const today = getTodayString();
     const filePath = path.join(DEVOTIONALS_DIR, `${today}.json`);
     
-    // Check if devotional already exists (unless force regenerate)
+    const tracker = new ContentTracker();
+    
     if (fs.existsSync(filePath) && !FORCE_REGENERATE) {
         console.log(`✅ Devotional for ${today} already exists. Skipping generation.`);
         console.log('   Use FORCE_REGENERATE=true to override.');
@@ -231,23 +341,23 @@ async function generateTodaysDevotional() {
     }
     
     try {
-        // Get current astronomical data
         const astronomicalData = getCurrentAstronomicalData();
-        console.log('🌌 Astronomical data gathered:', astronomicalData);
+        console.log('🌌 Astronomical data gathered:');
+        console.log('   Moon:', astronomicalData.moonPhase, astronomicalData.moonIllumination);
+        console.log('   Planets:', astronomicalData.visiblePlanets);
+        console.log('   Event:', astronomicalData.specialEvents);
         
         let devotionalContent;
         
         try {
-            // Try to generate using AI
-            console.log('🤖 Attempting AI generation...');
-            devotionalContent = await generateDevotionalContent(astronomicalData);
+            console.log('🤖 Attempting AI generation with uniqueness checking...');
+            devotionalContent = await generateDevotionalContent(astronomicalData, tracker);
             console.log('✅ AI generation successful!');
         } catch (error) {
-            console.log('⚠️  AI generation failed, using fallback:', error.message);
+            console.log('⚠️  AI generation failed, using enhanced fallback:', error.message);
             devotionalContent = createFallbackDevotional(astronomicalData);
         }
         
-        // Create the complete devotional object
         const devotional = {
             id: `devotional-${today}`,
             date: today,
@@ -255,24 +365,38 @@ async function generateTodaysDevotional() {
             content: devotionalContent.content,
             scriptureReference: devotionalContent.scriptureReference,
             celestialConnection: devotionalContent.celestialConnection,
+            theme: devotionalContent.theme || 'general',
             moonPhase: astronomicalData.moonPhase,
+            moonIllumination: astronomicalData.moonIllumination,
             visiblePlanets: astronomicalData.visiblePlanets,
             specialEvents: astronomicalData.specialEvents,
+            constellations: astronomicalData.constellations,
             bestViewingTime: astronomicalData.bestViewingTime,
             season: astronomicalData.season,
+            location: astronomicalData.location,
             createdAt: new Date().toISOString(),
-            isFallback: !OPENAI_API_KEY || OPENAI_API_KEY === ''
+            isFallback: !OPENAI_API_KEY || OPENAI_API_KEY === '',
+            version: '2.0'
         };
         
-        // Write to file
+        tracker.recordDevotional(devotional);
+        
         fs.writeFileSync(filePath, JSON.stringify(devotional, null, 2));
         
         console.log('🎉 Devotional generated successfully!');
         console.log(`📖 Title: ${devotional.title}`);
         console.log(`📜 Scripture: ${devotional.scriptureReference}`);
-        console.log(`🌙 Moon Phase: ${devotional.moonPhase}`);
-        console.log(`📏 Content Length: ${devotional.content.length} characters`);
-        console.log(`📁 Saved to: ${filePath}`);
+        console.log(`🌙 Moon: ${devotional.moonPhase} (${devotional.moonIllumination})`);
+        console.log(`🪐 Planets: ${devotional.visiblePlanets}`);
+        console.log(`✨ Event: ${devotional.specialEvents}`);
+        console.log(`📏 Content: ${devotional.content.length} characters`);
+        console.log(`💾 Saved to: ${filePath}`);
+        
+        const report = tracker.getUsageReport();
+        console.log('\n📊 Tracker Stats:');
+        console.log(`   Total: ${report.overview.totalDevotionals}`);
+        console.log(`   Unique titles: ${report.overview.uniqueTitles}`);
+        console.log(`   Scripture variety: ${report.overview.scriptureCoverage}`);
         
     } catch (error) {
         console.error('❌ Error generating devotional:', error);
@@ -280,7 +404,6 @@ async function generateTodaysDevotional() {
     }
 }
 
-// Run if called directly
 if (require.main === module) {
     generateTodaysDevotional()
         .then(() => {
