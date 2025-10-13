@@ -53,4 +53,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(ons): add Our Night Sky devotional for $(date -u +'%Y-%m-%d')"
-          file_pattern: devotionals/our-night-sky/*.json
+          file_pattern: devotionals/*.json
