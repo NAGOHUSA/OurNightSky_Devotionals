@@ -1,0 +1,23 @@
+{
+  "app": "Our Night Sky",
+  "date": "2025-10-13",
+  "provider": "groq",
+  "model": "llama-3.1-8b-instant",
+  "max_tokens": 500,
+  "temperature": 0.7,
+  "words": 208,
+  "hemisphere": "Northern",
+  "location": null,
+  "content_markdown": "# Evening Glow of Autumn\n\n## Scripture\n\"And the evening and the morning were the first day.\" - Genesis 1:5 (NKJV)\n\n## Reflection\nAs the autumn evenings settle in, the sky transforms into a kaleidoscope of warm hues. The sun dips lower in the horizon, casting a golden glow across the landscape. In this season of change, we're reminded that our lives are not static, but dynamic. Just as the seasons shift, our faith journey ebbs and flows. We face challenges, but also opportunities for growth and renewal. As we gaze up at the evening sky, we're encouraged to trust that God is working in our lives, guiding us through the darkness into a brighter tomorrow. Just as the stars twinkle in the night sky, our hope is not in the fleeting moments, but in the promise of eternal life with Him.\n\n## Prayer\nWe thank you, Lord, for the beauty of autumn evenings and the reminder of your eternal plan for us. Help us trust in your goodness and guidance, even in uncertain times. May our faith shine brightly, like the evening stars, in the darkness.\n\n## One-Line Application\nMay our hearts be filled with hope and trust in God's goodness, like the evening glow of autumn.",
+  "meta": {
+    "version": "ons-celestial-1",
+    "constraints": {
+      "scripture_quote_words_max": 50,
+      "total_words_target": [
+        250,
+        350
+      ],
+      "celestial_focus": true
+    }
+  }
+}
