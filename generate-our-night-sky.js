@@ -21,11 +21,6 @@ const USER_LOCATION = process.env.ONS_LOCATION || "";     // e.g., "Macon, GA, U
 const HEMISPHERE    = (process.env.ONS_HEMISPHERE || "Northern").trim();
 
 // ===== Provider config =====
-const OA = {
-  apiKey: process.env.OPENAI_API_KEY,
-  model:  process.env.OPENAI_MODEL || "gpt-4o-mini",
-  url:    "https://api.openai.com/v1/chat/completions",
-};
 const GQ = {
   apiKey: process.env.GROQ_API_KEY,
   model:  process.env.GROQ_MODEL || "llama-3.1-8b-instant",
@@ -35,6 +30,11 @@ const DS = {
   apiKey: process.env.DEEPSEEK_API_KEY,
   model:  process.env.DEEPSEEK_MODEL || "deepseek-chat",
   url:    "https://api.deepseek.com/chat/completions",
+};
+const OA = {
+  apiKey: process.env.OPENAI_API_KEY,
+  model:  process.env.OPENAI_MODEL || "gpt-4o-mini",
+  url:    "https://api.openai.com/v1/chat/completions",
 };
 
 // ===== Prompt (celestial focus, uplifting + encouraging) =====
@@ -187,7 +187,7 @@ async function writeResult({provider,model,content}, dateISO){
   const wc = wordCount(content);
   if(wc < 120) throw new Error(`Too short (${wc} words) from ${provider}`);
 
-  const outDir = path.resolve("devotionals/our-night-sky"); // separate folder
+  const outDir = path.resolve("devotionals/"); // separate folder
   await fs.mkdir(outDir, { recursive: true });
   const outPath = path.join(outDir, `${dateISO}.json`);
   const payload = {
