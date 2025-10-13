@@ -1,23 +1,15 @@
 {
-  "app": "Our Night Sky",
-  "date": "2025-10-13",
-  "provider": "groq",
-  "model": "llama-3.1-8b-instant",
-  "max_tokens": 500,
-  "temperature": 0.7,
-  "words": 208,
-  "hemisphere": "Northern",
-  "location": null,
-  "content_markdown": "# Evening Glow of Autumn\n\n## Scripture\n\"And the evening and the morning were the first day.\" - Genesis 1:5 (NKJV)\n\n## Reflection\nAs the autumn evenings settle in, the sky transforms into a kaleidoscope of warm hues. The sun dips lower in the horizon, casting a golden glow across the landscape. In this season of change, we're reminded that our lives are not static, but dynamic. Just as the seasons shift, our faith journey ebbs and flows. We face challenges, but also opportunities for growth and renewal. As we gaze up at the evening sky, we're encouraged to trust that God is working in our lives, guiding us through the darkness into a brighter tomorrow. Just as the stars twinkle in the night sky, our hope is not in the fleeting moments, but in the promise of eternal life with Him.\n\n## Prayer\nWe thank you, Lord, for the beauty of autumn evenings and the reminder of your eternal plan for us. Help us trust in your goodness and guidance, even in uncertain times. May our faith shine brightly, like the evening stars, in the darkness.\n\n## One-Line Application\nMay our hearts be filled with hope and trust in God's goodness, like the evening glow of autumn.",
-  "meta": {
-    "version": "ons-celestial-1",
-    "constraints": {
-      "scripture_quote_words_max": 50,
-      "total_words_target": [
-        250,
-        350
-      ],
-      "celestial_focus": true
-    }
-  }
+  "id": "devotional-2025-10-13",
+  "date": "2025-09-06",
+  "title": "Under Heaven's Canopy",
+  "content": "Tonight's sky speaks of God's faithfulness in ways that transcend our earthly concerns. The first quarter reminds us that even in seasons of change, divine love remains constant. As Mars, Saturn shine above, we're reminded that God has numbered every star and calls each by name. In this autumn evening, let the vastness of creation draw your heart to the intimate love of our Creator. The same God who set the celestial bodies in motion cares deeply for your every need. Take a moment to step outside during 9:00 pm - 11:00 pm local time and let the night sky remind you of promises that never fail. Tonight's special feature, the milky way stretches across the celestial dome, serves as a gentle reminder that divine order persists even when our world feels chaotic. Rest in the knowledge that the One who created this magnificent display holds you in perfect love.",
+  "scriptureReference": "Isaiah 40:26",
+  "celestialConnection": "Tonight's first quarter and Mars, Saturn serve as faithful witnesses to God's unchanging character. Even as seasons change, His love remains constant.",
+  "moonPhase": "First Quarter",
+  "visiblePlanets": "Mars, Saturn",
+  "specialEvents": "The Milky Way stretches across the celestial dome",
+  "bestViewingTime": "9:00 PM - 11:00 PM local time",
+  "season": "Autumn",
+  "createdAt": "2025-09-06T03:32:38.850Z",
+  "isFallback": false
 }
