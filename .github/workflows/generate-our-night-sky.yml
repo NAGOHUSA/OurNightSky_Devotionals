@@ -1,0 +1,56 @@
+name: Generate Our Night Sky Devotional
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 00:00 UTC daily
+  workflow_dispatch: {}
+
+jobs:
+  generate-devotional:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧰 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # No npm install needed — script uses native fetch only.
+
+      - name: 🌌 Generate Our Night Sky Devotional (OpenAI → Groq → DeepSeek)
+        env:
+          # Provider order (change anytime)
+          DEVOTIONAL_PROVIDERS: openai,groq,deepseek
+
+          # OpenAI
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-4o-mini
+
+          # Groq
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: llama-3.1-8b-instant
+
+          # DeepSeek
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_MODEL: deepseek-chat
+
+          # Cost / behavior knobs
+          DEVOTIONAL_MAX_TOKENS: "500"
+          DEVOTIONAL_TEMPERATURE: "0.7"
+          DEVOTIONAL_WORDS_MIN: "250"
+          DEVOTIONAL_WORDS_MAX: "350"
+          DEVOTIONAL_TIMEOUT_MS: "25000"
+          DEVOTIONAL_MAX_ATTEMPTS: "2"
+
+          # Optional: personalize sky references (kept broad if unset)
+          # ONS_LOCATION: "Macon, GA, USA"
+          # ONS_HEMISPHERE: "Northern"
+        run: node generate-our-night-sky.js
+
+      - name: ✅ Commit results
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(ons): add Our Night Sky devotional for $(date -u +'%Y-%m-%d')"
+          file_pattern: devotionals/our-night-sky/*.json
