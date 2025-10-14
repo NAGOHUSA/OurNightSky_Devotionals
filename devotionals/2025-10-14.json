@@ -1,0 +1,23 @@
+{
+  "app": "Our Night Sky",
+  "date": "2025-10-14",
+  "provider": "groq",
+  "model": "llama-3.1-8b-instant",
+  "max_tokens": 500,
+  "temperature": 0.7,
+  "words": 257,
+  "hemisphere": "Northern",
+  "location": null,
+  "content_markdown": "# Shining Through the Autumn Harvest\n\n## Scripture\n\"For God, who said, 'Let light shine out of darkness,' has shone in our hearts to give the light of the knowledge of the glory of God in the face of Jesus Christ.\" - 2 Corinthians 4:6\n\n## Reflection\nAs we gaze upon the autumn sky, the harvest moon glows with a soft yet radiant light. It illuminates the night, a reminder that even in the darkest moments, God's light shines through. Just as the harvest moon's gentle glow guides us through the autumnal night, Jesus' light in our hearts guides us through life's challenges. We are not left to navigate the darkness alone, for His light shines brightly, leading us to the knowledge of His glory.\n\nIn this season of harvest, we remember that our lives are not our own; we are called to yield to God's plan and trust in His sovereignty. As the stars twinkle above, we are reminded of the infinite and majestic beauty of creation, a reflection of God's glory. May our hearts be filled with the light of Christ, that we may shine as beacons of hope in a world in need.\n\n## Prayer\nWe thank You, heavenly Father, for the light that shines through our hearts, guiding us through life's darkness. Help us to reflect Your glory in all we do, that we may be a shining harvest of hope to those around us.\n\n## One-Line Application\nMay God's light in our hearts lead us to trust in His sovereignty this autumn.",
+  "meta": {
+    "version": "ons-celestial-1",
+    "constraints": {
+      "scripture_quote_words_max": 50,
+      "total_words_target": [
+        250,
+        350
+      ],
+      "celestial_focus": true
+    }
+  }
+}
