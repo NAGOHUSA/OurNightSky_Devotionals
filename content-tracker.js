@@ -15,6 +15,8 @@ function readJson(p) {
   }
 }
 
+const DATE_FILE_REGEX = /^\d{4}-\d{2}-\d{2}\.json$/; // NEW: 2025-10-13.json
+
 function main() {
   if (!fs.existsSync(DIR)) {
     fs.writeFileSync(TRACK, JSON.stringify({ latest: null, count: 0, files: [] }, null, 2));
@@ -24,8 +26,8 @@ function main() {
 
   const files = fs
     .readdirSync(DIR)
-    .filter((f) => f.startsWith("devotional-") && f.endsWith(".json"))
-    .sort(); // lexicographic matches date order YYYY-MM-DD
+    .filter((f) => DATE_FILE_REGEX.test(f))
+    .sort(); // YYYY-MM-DD.json sorts chronologically
 
   let latest = null;
   const records = [];
@@ -34,7 +36,6 @@ function main() {
     const full = path.join(DIR, f);
     const obj = readJson(full);
     if (!obj) continue;
-    // Expect v2.0 shape
     const record = {
       id: obj.id,
       date: obj.date,
@@ -46,7 +47,7 @@ function main() {
       version: obj.version
     };
     records.push({ file: f, ...record });
-    latest = record; // last in sorted list is newest
+    latest = record; // last is newest
   }
 
   const out = {
