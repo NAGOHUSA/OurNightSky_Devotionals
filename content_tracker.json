@@ -6,20 +6,409 @@
     "location": "Macon, Georgia",
     "theme": "wonder",
     "season": "Autumn",
-    "createdAt": "2025-10-14T15:52:45.435Z",
+    "createdAt": "2025-10-14T16:49:23.185Z",
     "version": "2.0"
   },
-  "count": 1,
+  "count": 47,
   "files": [
     {
-      "file": "devotional-2025-10-14.json",
+      "file": "2025-08-28.json",
+      "id": "devotional-2025-08-28",
+      "date": "2025-08-28",
+      "title": "Light in the Darkness",
+      "season": "Summer",
+      "createdAt": "2025-08-28T16:28:00.889Z"
+    },
+    {
+      "file": "2025-08-29.json",
+      "id": "devotional-2025-08-29",
+      "date": "2025-08-29",
+      "title": "Light in the Darkness",
+      "season": "Summer",
+      "createdAt": "2025-08-29T03:38:30.369Z"
+    },
+    {
+      "file": "2025-08-30.json",
+      "id": "devotional-2025-08-30",
+      "date": "2025-08-30",
+      "title": "The Vast Canvas of Creation",
+      "season": "Summer",
+      "createdAt": "2025-08-30T03:33:44.554Z"
+    },
+    {
+      "file": "2025-08-31.json",
+      "id": "devotional-2025-08-31",
+      "date": "2025-08-31",
+      "title": "The Vast Canvas of Creation",
+      "season": "Summer",
+      "createdAt": "2025-08-31T03:43:30.327Z"
+    },
+    {
+      "file": "2025-09-01.json",
+      "id": "devotional-2025-09-01",
+      "date": "2025-09-01",
+      "title": "Whispers in the Night Sky",
+      "season": "Autumn",
+      "createdAt": "2025-09-01T14:08:25.568Z"
+    },
+    {
+      "file": "2025-09-02.json",
+      "id": "devotional-2025-09-02",
+      "date": "2025-09-02",
+      "title": "The Language of Light",
+      "season": "Autumn",
+      "createdAt": "2025-09-02T03:45:11.913Z"
+    },
+    {
+      "file": "2025-09-03.json",
+      "id": "devotional-2025-09-03",
+      "date": "2025-09-03",
+      "title": "God's Celestial Timepiece",
+      "season": "Autumn",
+      "createdAt": "2025-09-03T03:18:47.564Z"
+    },
+    {
+      "file": "2025-09-04.json",
+      "id": "devotional-2025-09-04",
+      "date": "2025-09-04",
+      "title": "Whispers in the Night Sky",
+      "season": "Autumn",
+      "createdAt": "2025-09-04T03:19:47.045Z"
+    },
+    {
+      "file": "2025-09-05.json",
+      "id": "devotional-2025-09-05",
+      "date": "2025-09-05",
+      "title": "Celestial Reflections",
+      "season": "Autumn",
+      "createdAt": "2025-09-05T11:35:58.701Z"
+    },
+    {
+      "file": "2025-09-06.json",
+      "id": "devotional-2025-09-06",
+      "date": "2025-09-06",
+      "title": "Under Heaven's Canopy",
+      "season": "Autumn",
+      "createdAt": "2025-09-06T03:32:38.850Z"
+    },
+    {
+      "file": "2025-09-07.json",
+      "id": "devotional-2025-09-07",
+      "date": "2025-09-07",
+      "title": "Stars of Promise",
+      "season": "Autumn",
+      "createdAt": "2025-09-07T03:38:20.323Z"
+    },
+    {
+      "file": "2025-09-08.json",
+      "id": "devotional-2025-09-08",
+      "date": "2025-09-08",
+      "title": "God's Faithful Light",
+      "season": "Autumn",
+      "createdAt": "2025-09-08T03:45:40.862Z"
+    },
+    {
+      "file": "2025-09-09.json",
+      "id": "devotional-2025-09-09",
+      "date": "2025-09-09",
+      "title": "Night's Silent Testimony",
+      "season": "Autumn",
+      "createdAt": "2025-09-09T03:40:27.864Z"
+    },
+    {
+      "file": "2025-09-11.json",
+      "id": "devotional-2025-09-11",
+      "date": "2025-09-11",
+      "title": "Under Heaven's Canopy",
+      "season": "Autumn",
+      "createdAt": "2025-09-11T01:27:50.556Z"
+    },
+    {
+      "file": "2025-09-12.json",
+      "id": "devotional-2025-09-12",
+      "date": "2025-09-12",
+      "title": "Stars of Promise",
+      "season": "Autumn",
+      "createdAt": "2025-09-12T03:02:41.292Z"
+    },
+    {
+      "file": "2025-09-13.json",
+      "id": "devotional-2025-09-13",
+      "date": "2025-09-13",
+      "title": "God's Faithful Light",
+      "season": "Autumn",
+      "createdAt": "2025-09-13T02:40:39.658Z"
+    },
+    {
+      "file": "2025-09-14.json",
+      "id": "devotional-2025-09-14",
+      "date": "2025-09-14",
+      "title": "Night's Silent Testimony",
+      "season": "Autumn",
+      "createdAt": "2025-09-14T03:11:32.262Z"
+    },
+    {
+      "file": "2025-09-15.json",
+      "id": "devotional-2025-09-15",
+      "date": "2025-09-15",
+      "title": "Celestial Reflections",
+      "season": "Autumn",
+      "createdAt": "2025-09-15T03:17:42.369Z"
+    },
+    {
+      "file": "2025-09-16.json",
+      "id": "devotional-2025-09-16",
+      "date": "2025-09-16",
+      "title": "Under Heaven's Canopy",
+      "season": "Autumn",
+      "createdAt": "2025-09-16T03:04:14.605Z"
+    },
+    {
+      "file": "2025-09-17.json",
+      "id": "devotional-2025-09-17",
+      "date": "2025-09-17",
+      "title": "Stars of Promise",
+      "season": "Autumn",
+      "createdAt": "2025-09-17T03:02:54.697Z"
+    },
+    {
+      "file": "2025-09-18.json",
+      "id": "devotional-2025-09-18",
+      "date": "2025-09-18",
+      "title": "God's Faithful Light",
+      "season": "Autumn",
+      "createdAt": "2025-09-18T03:06:08.366Z"
+    },
+    {
+      "file": "2025-09-19.json",
+      "id": "devotional-2025-09-19",
+      "date": "2025-09-19",
+      "title": "Night's Silent Testimony",
+      "season": "Autumn",
+      "createdAt": "2025-09-19T03:09:31.089Z"
+    },
+    {
+      "file": "2025-09-20.json",
+      "id": "devotional-2025-09-20",
+      "date": "2025-09-20",
+      "title": "Celestial Reflections",
+      "season": "Autumn",
+      "createdAt": "2025-09-20T03:02:17.238Z"
+    },
+    {
+      "file": "2025-09-21.json",
+      "id": "devotional-2025-09-21",
+      "date": "2025-09-21",
+      "title": "Under Heaven's Canopy",
+      "season": "Autumn",
+      "createdAt": "2025-09-21T03:16:12.278Z"
+    },
+    {
+      "file": "2025-09-22.json",
+      "id": "devotional-2025-09-22",
+      "date": "2025-09-22",
+      "title": "Stars of Promise",
+      "season": "Autumn",
+      "createdAt": "2025-09-22T03:15:35.703Z"
+    },
+    {
+      "file": "2025-09-23.json",
+      "id": "devotional-2025-09-23",
+      "date": "2025-09-23",
+      "title": "God's Faithful Light",
+      "season": "Autumn",
+      "createdAt": "2025-09-23T00:59:33.675Z"
+    },
+    {
+      "file": "2025-09-24.json",
+      "id": "devotional-2025-09-24",
+      "date": "2025-09-24",
+      "title": "Night's Silent Testimony",
+      "season": "Autumn",
+      "createdAt": "2025-09-24T01:00:03.067Z"
+    },
+    {
+      "file": "2025-09-25.json",
+      "id": "devotional-2025-09-25",
+      "date": "2025-09-25",
+      "title": "Celestial Reflections",
+      "season": "Autumn",
+      "createdAt": "2025-09-25T01:00:27.831Z"
+    },
+    {
+      "file": "2025-09-26.json",
+      "id": "devotional-2025-09-26",
+      "date": "2025-09-26",
+      "title": "Under Heaven's Canopy",
+      "season": "Autumn",
+      "createdAt": "2025-09-26T01:00:16.388Z"
+    },
+    {
+      "file": "2025-09-27.json",
+      "id": "devotional-2025-09-27",
+      "date": "2025-09-27",
+      "title": "Stars of Promise",
+      "season": "Autumn",
+      "createdAt": "2025-09-27T00:58:04.545Z"
+    },
+    {
+      "file": "2025-09-28.json",
+      "id": "devotional-2025-09-28",
+      "date": "2025-09-28",
+      "title": "God's Faithful Light",
+      "season": "Autumn",
+      "createdAt": "2025-09-28T01:06:44.158Z"
+    },
+    {
+      "file": "2025-09-29.json",
+      "id": "devotional-2025-09-29",
+      "date": "2025-09-29",
+      "title": "Night's Silent Testimony",
+      "season": "Autumn",
+      "createdAt": "2025-09-29T01:02:10.223Z"
+    },
+    {
+      "file": "2025-09-30.json",
+      "id": "devotional-2025-09-30",
+      "date": "2025-09-30",
+      "title": "Celestial Reflections",
+      "season": "Autumn",
+      "createdAt": "2025-09-30T01:01:16.640Z"
+    },
+    {
+      "file": "2025-10-01.json",
+      "id": "devotional-2025-10-01",
+      "date": "2025-10-01",
+      "title": "Under Heaven's Canopy",
+      "season": "Autumn",
+      "createdAt": "2025-10-01T01:07:20.844Z"
+    },
+    {
+      "file": "2025-10-02.json",
+      "id": "devotional-2025-10-02",
+      "date": "2025-10-02",
+      "title": "Stars of Promise",
+      "season": "Autumn",
+      "createdAt": "2025-10-02T00:59:15.273Z"
+    },
+    {
+      "file": "2025-10-03.json",
+      "id": "devotional-2025-10-03",
+      "date": "2025-10-03",
+      "title": "God's Faithful Light",
+      "season": "Autumn",
+      "createdAt": "2025-10-03T00:59:15.051Z"
+    },
+    {
+      "file": "2025-10-04.json",
+      "id": "devotional-2025-10-04",
+      "date": "2025-10-04",
+      "title": "Night's Silent Testimony",
+      "season": "Autumn",
+      "createdAt": "2025-10-04T00:56:52.012Z"
+    },
+    {
+      "file": "2025-10-05.json",
+      "id": "devotional-2025-10-05",
+      "date": "2025-10-05",
+      "title": "Whispers in the Cosmic Cathedral",
+      "location": "Macon, Georgia",
+      "theme": "wonder",
+      "season": "Autumn",
+      "createdAt": "2025-10-05T01:06:00.878Z",
+      "version": "2.0"
+    },
+    {
+      "file": "2025-10-06.json",
+      "id": "devotional-2025-10-06",
+      "date": "2025-10-06",
+      "title": "The Eternal Watchman",
+      "location": "Macon, Georgia",
+      "theme": "faithfulness",
+      "season": "Autumn",
+      "createdAt": "2025-10-06T01:01:18.333Z",
+      "version": "2.0"
+    },
+    {
+      "file": "2025-10-07.json",
+      "id": "devotional-2025-10-07",
+      "date": "2025-10-07",
+      "title": "Whispers in the Cosmic Cathedral",
+      "location": "Macon, Georgia",
+      "theme": "wonder",
+      "season": "Autumn",
+      "createdAt": "2025-10-07T01:00:08.942Z",
+      "version": "2.0"
+    },
+    {
+      "file": "2025-10-08.json",
+      "id": "devotional-2025-10-08",
+      "date": "2025-10-08",
+      "title": "The Eternal Watchman",
+      "location": "Macon, Georgia",
+      "theme": "faithfulness",
+      "season": "Autumn",
+      "createdAt": "2025-10-08T00:59:48.265Z",
+      "version": "2.0"
+    },
+    {
+      "file": "2025-10-09.json",
+      "id": "devotional-2025-10-09",
+      "date": "2025-10-09",
+      "title": "Whispers in the Cosmic Cathedral",
+      "location": "Macon, Georgia",
+      "theme": "wonder",
+      "season": "Autumn",
+      "createdAt": "2025-10-09T01:00:43.598Z",
+      "version": "2.0"
+    },
+    {
+      "file": "2025-10-10.json",
+      "id": "devotional-2025-10-10",
+      "date": "2025-10-10",
+      "title": "The Eternal Watchman",
+      "location": "Macon, Georgia",
+      "theme": "faithfulness",
+      "season": "Autumn",
+      "createdAt": "2025-10-10T01:00:20.549Z",
+      "version": "2.0"
+    },
+    {
+      "file": "2025-10-11.json",
+      "id": "devotional-2025-10-11",
+      "date": "2025-10-11",
+      "title": "Whispers in the Cosmic Cathedral",
+      "location": "Macon, Georgia",
+      "theme": "wonder",
+      "season": "Autumn",
+      "createdAt": "2025-10-11T00:57:55.961Z",
+      "version": "2.0"
+    },
+    {
+      "file": "2025-10-12.json",
+      "id": "devotional-2025-10-12",
+      "date": "2025-10-12",
+      "title": "God's Faithful Light",
+      "season": "Current season",
+      "createdAt": "2025-10-12T01:11:12.858Z"
+    },
+    {
+      "file": "2025-10-13.json",
+      "id": "devotional-2025-10-13",
+      "date": "2025-09-06",
+      "title": "Under Heaven's Canopy",
+      "season": "Autumn",
+      "createdAt": "2025-09-06T03:32:38.850Z"
+    },
+    {
+      "file": "2025-10-14.json",
       "id": "devotional-2025-10-14",
       "date": "2025-10-14",
       "title": "The Heavens Declare",
       "location": "Macon, Georgia",
       "theme": "wonder",
       "season": "Autumn",
-      "createdAt": "2025-10-14T15:52:45.435Z",
+      "createdAt": "2025-10-14T16:49:23.185Z",
       "version": "2.0"
     }
   ]
