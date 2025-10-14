@@ -7,28 +7,24 @@ import path from "path";
 
 const TZ = "America/New_York";
 
-// ---------- Config via env (with sensible defaults) ----------
+// ---------- Config via env ----------
 const LOCATION = process.env.ONS_LOCATION || "Macon, Georgia";
 const THEME_DEFAULT = "wonder";
 
-// Provider bases (override if needed)
 const GROK_API_BASE = process.env.GROK_API_BASE || "https://api.x.ai/v1";
 const OPENAI_API_BASE = process.env.OPENAI_API_BASE || "https://api.openai.com/v1";
 const DEEPSEEK_API_BASE = process.env.DEEPSEEK_API_BASE || "https://api.deepseek.com/v1";
 
-// Models (override in secrets if you want)
 const GROK_MODEL = process.env.GROK_MODEL || "grok-2-mini";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || "deepseek-chat";
 
-// Required API keys (set in Actions secrets)
 const GROK_API_KEY = process.env.GROK_API_KEY || process.env.XAI_API_KEY || "";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || "";
 
 // ---------- Dates ----------
 function todayLocalISO(tz = TZ) {
-  // Use UTC “today” then format as YYYY-MM-DD (New York)
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-CA", { timeZone: tz }); // YYYY-MM-DD
   return dateStr;
@@ -40,9 +36,10 @@ function isoNow() {
 
 const DATE = process.env.ONS_DATE || todayLocalISO();
 
-// ---------- Output paths ----------
+// ---------- Output paths (CHANGED) ----------
 const OUT_DIR = path.join("devotionals");
-const OUT_FILE = path.join(OUT_DIR, `devotional-${DATE}.json`);
+// WRITE FILE AS <YYYY-MM-DD>.json (no "devotional-" prefix)
+const OUT_FILE = path.join(OUT_DIR, `${DATE}.json`);
 
 // ---------- Prompt ----------
 const systemPrompt = `
@@ -96,9 +93,8 @@ function ensureDir(dir) {
 }
 
 function extractJson(text) {
-  // Best-effort: grab the first {...} block
   const match = text.match(/\{[\s\S]*\}$/);
-  return match ? match[0] : text; // if model already returned only JSON
+  return match ? match[0] : text;
 }
 
 function validateShape(obj) {
@@ -198,12 +194,10 @@ async function main() {
     } catch (err) {
       lastErr = err;
       usedProvider = null;
-      // proceed to next provider
     }
   }
 
   if (!raw) {
-    // As an absolute fallback, emit a minimal placeholder so the app doesn't crash
     const fallback = {
       id: `devotional-${DATE}`,
       date: DATE,
@@ -231,17 +225,14 @@ async function main() {
     process.exit(0);
   }
 
-  // Parse / repair JSON if the model added extra text
   let parsed;
   try {
     parsed = JSON.parse(extractJson(raw));
   } catch (e) {
-    // last-ditch: try to trim stray characters
     const trimmed = extractJson(raw).trim();
     parsed = JSON.parse(trimmed);
   }
 
-  // Force required fields to exact values we control
   parsed.id = `devotional-${DATE}`;
   parsed.date = DATE;
   parsed.location = LOCATION;
@@ -249,10 +240,8 @@ async function main() {
   parsed.version = "2.0";
   parsed.isFallback = (usedProvider !== "GROK");
 
-  // Validate
   validateShape(parsed);
 
-  // Write
   fs.writeFileSync(OUT_FILE, JSON.stringify(parsed, null, 2));
   console.log(`Wrote ${OUT_FILE} via ${usedProvider}`);
 }
