@@ -1,206 +1,263 @@
-// generate-devotional.js — Multi-provider (DeepSeek → OpenAI → Groq)
-// Outputs EXACT schema required by the app.
-// Node 18+ (global fetch). No external deps.
+// generate-our-night-sky.js
+// Emits the v2.0 schema your iOS app expects, with API fallbacks in order:
+// GROK -> OPENAI -> DEEPSEEK
 
-import fs from "node:fs/promises";
-import path from "node:path";
+import fs from "fs";
+import path from "path";
 
-// ===== Provider order (configurable) =====
-const PROVIDERS = (process.env.DEVOTIONAL_PROVIDERS || "deepseek,openai,groq")
-  .split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
-const PRIMARY_PROVIDER = PROVIDERS[0] || "deepseek";
+const TZ = "America/New_York";
 
-// ===== Content & cost controls =====
-const MAX_TOKENS   = Number(process.env.DEVOTIONAL_MAX_TOKENS || 500);
-const TEMPERATURE  = Number(process.env.DEVOTIONAL_TEMPERATURE || 0.7);
-const TIMEOUT_MS   = Number(process.env.DEVOTIONAL_TIMEOUT_MS  || 25000);
-const MAX_ATTEMPTS = Number(process.env.DEVOTIONAL_MAX_ATTEMPTS || 2);
-const WORDS_MIN    = Number(process.env.DEVOTIONAL_WORDS_MIN || 220);
-const WORDS_MAX    = Number(process.env.DEVOTIONAL_WORDS_MAX || 320);
-const THEME        = process.env.DEVO_THEME || "";
+// ---------- Config via env (with sensible defaults) ----------
+const LOCATION = process.env.ONS_LOCATION || "Macon, Georgia";
+const THEME_DEFAULT = "wonder";
 
-// ===== Provider config =====
-const DS = {
-  apiKey: process.env.DEEPSEEK_API_KEY,
-  model:  process.env.DEEPSEEK_MODEL || "deepseek-chat",
-  url:    "https://api.deepseek.com/chat/completions",
-};
-const OA = {
-  apiKey: process.env.OPENAI_API_KEY,
-  model:  process.env.OPENAI_MODEL || "gpt-4o-mini",
-  url:    "https://api.openai.com/v1/chat/completions",
-};
-const GQ = {
-  apiKey: process.env.GROQ_API_KEY,
-  model:  process.env.GROQ_MODEL || "llama-3.1-8b-instant",
-  url:    "https://api.groq.com/openai/v1/chat/completions",
-};
+// Provider bases (override if needed)
+const GROK_API_BASE = process.env.GROK_API_BASE || "https://api.x.ai/v1";
+const OPENAI_API_BASE = process.env.OPENAI_API_BASE || "https://api.openai.com/v1";
+const DEEPSEEK_API_BASE = process.env.DEEPSEEK_API_BASE || "https://api.deepseek.com/v1";
 
-// ===== Utilities =====
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
-function seasonFromMonth(m){ // 0-based month, Northern hemisphere default
-  return (m<=1||m===11) ? "Winter" : (m<=4) ? "Spring" : (m<=7) ? "Summer" : "Autumn";
-}
-function isoDateOnly(d=new Date()){ return d.toISOString().slice(0,10); }
-function nowIso(){ return new Date().toISOString(); }
+// Models (override in secrets if you want)
+const GROK_MODEL = process.env.GROK_MODEL || "grok-2-mini";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || "deepseek-chat";
 
-async function postJSON(url, body, headers, timeoutMs){
-  const controller = new AbortController();
-  const timer = setTimeout(()=>controller.abort(), timeoutMs);
-  try{
-    const res = await fetch(url, { method:"POST", signal:controller.signal,
-      headers:{ "Content-Type":"application/json", ...headers },
-      body: JSON.stringify(body)
-    });
-    const text = await res.text();
-    return { ok: res.ok, status: res.status, text };
-  } finally { clearTimeout(timer); }
+// Required API keys (set in Actions secrets)
+const GROK_API_KEY = process.env.GROK_API_KEY || process.env.XAI_API_KEY || "";
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || "";
+
+// ---------- Dates ----------
+function todayLocalISO(tz = TZ) {
+  // Use UTC “today” then format as YYYY-MM-DD (New York)
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-CA", { timeZone: tz }); // YYYY-MM-DD
+  return dateStr;
 }
 
-function buildMessagesForJSON({dateISO, theme, seasonGuess}) {
-  const system = [
-    "You are a Christian devotional writer and astronomy explainer.",
-    `Write a short daily devotional ${WORDS_MIN}-${WORDS_MAX} words, warm and theologically sound.`,
-    "Return ONLY a single JSON object (no markdown, no code fences).",
-    "JSON keys (exactly these, all required):",
-    "id, date, title, content, scriptureReference, celestialConnection, moonPhase, visiblePlanets, specialEvents, bestViewingTime, season, createdAt, isFallback",
-    "- id: 'devotional-YYYY-MM-DD' (match the date)",
-    "- date: YYYY-MM-DD (same as provided date)",
-    "- title: <= 6 words, title-case",
-    `- content: ${WORDS_MIN}-${WORDS_MAX} words, a single paragraph; no headings; pastoral and practical`,
-    "- scriptureReference: single verse like 'Psalm 19:1' (no verse text here)",
-    "- celestialConnection: one sentence linking the sky to faith; include the viewing window",
-    "- moonPhase: one of: New Moon, Waxing Crescent, First Quarter, Waxing Gibbous, Full Moon, Waning Gibbous, Last Quarter, Waning Crescent",
-    "- visiblePlanets: comma-separated list like 'Saturn, Jupiter, Mars' (or '' if none)",
-    "- specialEvents: a short phrase ('' if none)",
-    "- bestViewingTime: like '9:00 PM - 11:00 PM local time'",
-    `- season: '${seasonGuess}' if suitable, otherwise the correct season`,
-    "- createdAt: valid ISO 8601 timestamp (UTC now)",
-    "- isFallback: boolean, true if the primary model failed and a backup wrote this; else false.",
-    "Constraints:",
-    "- Any quoted Scripture inside content must be <= 50 words.",
-    "- Use correct capitalization for planet names and times.",
-    "- Do not include markdown or extra fields."
-  ].join(" ");
-  const user = [
-    `date: ${dateISO}`,
-    theme ? `theme: ${theme}` : "",
-    "Primary focus: connect tonight's sky to faith in one cohesive paragraph."
-  ].join("\n").trim();
-
-  return [{ role:"system", content: system }, { role:"user", content: user }];
+function isoNow() {
+  return new Date().toISOString();
 }
 
-function parseContentFromResponse(jsonText){
-  try { return JSON.parse(jsonText); } catch { return null; }
+const DATE = process.env.ONS_DATE || todayLocalISO();
+
+// ---------- Output paths ----------
+const OUT_DIR = path.join("devotionals");
+const OUT_FILE = path.join(OUT_DIR, `devotional-${DATE}.json`);
+
+// ---------- Prompt ----------
+const systemPrompt = `
+You are a Christian devotional writer who blends current night-sky highlights
+with Scripture and encouragement. Write *concise* content grounded in visible
+celestial events for the user's location and date.
+
+STRICTLY return JSON ONLY, following this schema exactly:
+{
+  "id": "devotional-YYYY-MM-DD",
+  "date": "YYYY-MM-DD",
+  "title": "string (max ~80 chars)",
+  "content": "1-2 short paragraphs, warm tone, tie sky to faith (200-300 words total)",
+  "scriptureReference": "Book Ch:Vs or range (e.g., Job 9:9)",
+  "celestialConnection": "1-2 sentences linking specific, likely-visible features",
+  "theme": "one-word (e.g., wonder, hope, trust, comfort)",
+  "moonPhase": "string",
+  "moonIllumination": "percentage like '75%'",
+  "visiblePlanets": "comma-separated list or 'None'",
+  "specialEvents": "short phrase (or 'None')",
+  "constellations": ["1..5 names"],
+  "bestViewingTime": "e.g., '9:00 PM - 10:30 PM local time'",
+  "season": "Winter|Spring|Summer|Autumn",
+  "location": "City, State",
+  "createdAt": "ISO timestamp",
+  "isFallback": false,
+  "version": "2.0"
 }
 
-function normalizeOutput(o, {dateISO, createdAtISO, isFallback}) {
-  const id = `devotional-${dateISO}`;
-  const out = {
-    id,
-    date: dateISO,
-    title: String(o.title || "").trim(),
-    content: String(o.content || "").trim(),
-    scriptureReference: String(o.scriptureReference || "").trim(),
-    celestialConnection: String(o.celestialConnection || "").trim(),
-    moonPhase: String(o.moonPhase || "").trim(),
-    visiblePlanets: Array.isArray(o.visiblePlanets) ? o.visiblePlanets.join(", ") : String(o.visiblePlanets || "").trim(),
-    specialEvents: String(o.specialEvents || "").trim(),
-    bestViewingTime: String(o.bestViewingTime || "").trim(),
-    season: String(o.season || "").trim(),
-    createdAt: createdAtISO,
-    isFallback: Boolean(
-      typeof o.isFallback === "boolean" ? o.isFallback : isFallback
-    ),
-  };
+CRITICAL RULES:
+- Use the provided date and location.
+- Make astronomy plausible for that season/date in the Northern Hemisphere.
+- Keep "content" uplifting, theologically sound, and practical.
+- Keep within the word targets.
+- Return ONLY the JSON object, no backticks, no extra text.
+`;
 
-  // Minimal required fixes:
-  // Ensure required fields present; if missing, set safe defaults.
-  if (!out.title) out.title = "Daily Reflection";
-  if (!out.scriptureReference) out.scriptureReference = "Psalm 19:1";
-  if (!out.moonPhase) out.moonPhase = "First Quarter";
-  if (!out.bestViewingTime) out.bestViewingTime = "9:00 PM - 11:00 PM local time";
-  if (!out.season) out.season = seasonFromMonth(new Date(dateISO).getUTCMonth());
-  if (!out.createdAt) out.createdAt = createdAtISO;
+function userPrompt({ date = DATE, location = LOCATION, theme = THEME_DEFAULT }) {
+  return `
+Date: ${date}
+Location: ${location}
+Theme (hint): ${theme}
 
-  return out;
+Ensure "id" is "devotional-${date}" and "location" exactly "${location}".
+`;
 }
 
-async function callProvider({name, url, model, apiKey, messages}) {
-  if (!apiKey) throw new Error(`MISSING_KEY_${name.toUpperCase()}`);
-  for (let attempt=1; attempt<=MAX_ATTEMPTS; attempt++){
-    const { ok, status, text } = await postJSON(
-      url,
-      { model, messages, temperature: TEMPERATURE, max_tokens: MAX_TOKENS },
-      { Authorization: `Bearer ${apiKey}` },
-      TIMEOUT_MS
-    );
-    if (!ok){
-      if (status === 402) throw Object.assign(new Error(`${name}_402`), { code:"INSUFFICIENT_BALANCE" });
-      if (status === 429 || status === 408 || (status>=500 && status<=599)){
-        if (attempt < MAX_ATTEMPTS){
-          const d = 800 * (2 ** (attempt - 1)) + Math.floor(Math.random()*250);
-          console.warn(`[${name}] transient ${status}; retry in ${d}ms`);
-          await sleep(d);
-          continue;
-        }
-      }
-      throw new Error(`[${name}] error ${status}: ${text}`);
-    }
-    const obj = parseContentFromResponse(text);
-    if (!obj || typeof obj !== "object") throw new Error(`[${name}] invalid JSON shape`);
-    return obj;
+// ---------- Helpers ----------
+function ensureDir(dir) {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+}
+
+function extractJson(text) {
+  // Best-effort: grab the first {...} block
+  const match = text.match(/\{[\s\S]*\}$/);
+  return match ? match[0] : text; // if model already returned only JSON
+}
+
+function validateShape(obj) {
+  const must = [
+    "id","date","title","content","scriptureReference","celestialConnection","theme",
+    "moonPhase","moonIllumination","visiblePlanets","specialEvents","constellations",
+    "bestViewingTime","season","location","createdAt","isFallback","version"
+  ];
+  for (const k of must) if (!(k in obj)) throw new Error(`Missing field: ${k}`);
+  if (!Array.isArray(obj.constellations)) throw new Error("constellations must be array");
+  if (obj.version !== "2.0") throw new Error("version must be '2.0'");
+}
+
+async function callOpenAICompat({ base, apiKey, model, messages }) {
+  const res = await fetch(`${base}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model,
+      messages,
+      temperature: 0.7,
+      max_tokens: 700
+    })
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`HTTP ${res.status} ${res.statusText} – ${body.slice(0, 300)}`);
   }
-  throw new Error(`[${name}] exhausted retries`);
+  const data = await res.json();
+  const content = data?.choices?.[0]?.message?.content;
+  if (!content) throw new Error("Empty content from provider");
+  return content;
 }
+
+// ---------- Providers in desired order ----------
+const providers = [
+  {
+    name: "GROK",
+    enabled: !!GROK_API_KEY,
+    call: () =>
+      callOpenAICompat({
+        base: GROK_API_BASE,
+        apiKey: GROK_API_KEY,
+        model: GROK_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt({}) }
+        ]
+      })
+  },
+  {
+    name: "OPENAI",
+    enabled: !!OPENAI_API_KEY,
+    call: () =>
+      callOpenAICompat({
+        base: OPENAI_API_BASE,
+        apiKey: OPENAI_API_KEY,
+        model: OPENAI_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt({}) }
+        ]
+      })
+  },
+  {
+    name: "DEEPSEEK",
+    enabled: !!DEEPSEEK_API_KEY,
+    call: () =>
+      callOpenAICompat({
+        base: DEEPSEEK_API_BASE,
+        apiKey: DEEPSEEK_API_KEY,
+        model: DEEPSEEK_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt({}) }
+        ]
+      })
+  }
+];
 
 async function main() {
-  const dateISO = isoDateOnly();
-  const createdAtISO = nowIso();
-  const seasonGuess = seasonFromMonth(new Date(dateISO).getUTCMonth());
+  ensureDir(OUT_DIR);
 
-  const messages = buildMessagesForJSON({ dateISO, theme: THEME, seasonGuess });
-
-  const providers = {
-    deepseek: { name:"deepseek", url:DS.url, model:DS.model, apiKey:DS.apiKey },
-    openai:   { name:"openai",   url:OA.url, model:OA.model, apiKey:OA.apiKey },
-    groq:     { name:"groq",     url:GQ.url, model:GQ.model, apiKey:GQ.apiKey },
-  };
-
+  let lastErr = null;
   let usedProvider = null;
-  let rawObj = null;
-  const errors = [];
+  let raw = null;
 
-  for (const key of PROVIDERS){
-    const p = providers[key];
-    if (!p){ console.warn(`Unknown provider "${key}" — skipping`); continue; }
-    try{
-      rawObj = await callProvider({ ...p, messages });
-      usedProvider = key;
+  for (const p of providers) {
+    if (!p.enabled) continue;
+    try {
+      usedProvider = p.name;
+      raw = await p.call();
       break;
-    } catch(e){
-      errors.push(`${key}: ${e.code || ""} ${e.message}`);
-      console.warn(`Provider ${key} failed: ${e.message}`);
-      continue;
+    } catch (err) {
+      lastErr = err;
+      usedProvider = null;
+      // proceed to next provider
     }
   }
 
-  if (!rawObj) throw new Error(`All providers failed. Details: ${errors.join(" | ")}`);
+  if (!raw) {
+    // As an absolute fallback, emit a minimal placeholder so the app doesn't crash
+    const fallback = {
+      id: `devotional-${DATE}`,
+      date: DATE,
+      title: "The Heavens Declare",
+      content:
+        "Step outside and look up. Even when clouds hide the stars, God's handiwork never ceases. Ask Him to brighten your heart as surely as dawn follows night.",
+      scriptureReference: "Psalm 19:1",
+      celestialConnection:
+        "Autumn evenings often reveal the royal 'W' of Cassiopeia and the Andromeda region rising high in the northeast.",
+      theme: THEME_DEFAULT,
+      moonPhase: "Unknown",
+      moonIllumination: "—",
+      visiblePlanets: "Jupiter, Saturn",
+      specialEvents: "None",
+      constellations: ["Cassiopeia", "Andromeda"],
+      bestViewingTime: "9:00 PM - 10:30 PM local time",
+      season: "Autumn",
+      location: LOCATION,
+      createdAt: isoNow(),
+      isFallback: true,
+      version: "2.0"
+    };
+    fs.writeFileSync(OUT_FILE, JSON.stringify(fallback, null, 2));
+    console.error("All providers failed. Wrote placeholder:", lastErr?.message || lastErr);
+    process.exit(0);
+  }
 
-  const isFallback = (usedProvider !== PRIMARY_PROVIDER);
-  const normalized = normalizeOutput(rawObj, { dateISO, createdAtISO, isFallback });
+  // Parse / repair JSON if the model added extra text
+  let parsed;
+  try {
+    parsed = JSON.parse(extractJson(raw));
+  } catch (e) {
+    // last-ditch: try to trim stray characters
+    const trimmed = extractJson(raw).trim();
+    parsed = JSON.parse(trimmed);
+  }
 
-  // Final: write EXACT file shape
-  const outDir = path.resolve("devotionals");
-  await fs.mkdir(outDir, { recursive: true });
-  const outPath = path.join(outDir, `${dateISO}.json`);
-  await fs.writeFile(outPath, JSON.stringify(normalized, null, 2), "utf-8");
+  // Force required fields to exact values we control
+  parsed.id = `devotional-${DATE}`;
+  parsed.date = DATE;
+  parsed.location = LOCATION;
+  parsed.createdAt = isoNow();
+  parsed.version = "2.0";
+  parsed.isFallback = (usedProvider !== "GROK");
 
-  console.log(`✅ Wrote ${outPath} via ${usedProvider} (isFallback=${normalized.isFallback})`);
+  // Validate
+  validateShape(parsed);
+
+  // Write
+  fs.writeFileSync(OUT_FILE, JSON.stringify(parsed, null, 2));
+  console.log(`Wrote ${OUT_FILE} via ${usedProvider}`);
 }
 
-main().catch(err => {
-  console.error("❌ Generation failed:", err);
+main().catch((e) => {
+  console.error("Fatal:", e);
   process.exit(1);
 });
