@@ -1,15 +1,15 @@
 {
   "latest": {
-    "id": "devotional-2025-10-14",
-    "date": "2025-10-14",
+    "id": "devotional-2025-10-15",
+    "date": "2025-10-15",
     "title": "The Heavens Declare",
     "location": "Macon, Georgia",
     "theme": "wonder",
     "season": "Autumn",
-    "createdAt": "2025-10-14T16:49:23.185Z",
+    "createdAt": "2025-10-15T08:31:31.705Z",
     "version": "2.0"
   },
-  "count": 47,
+  "count": 48,
   "files": [
     {
       "file": "2025-08-28.json",
@@ -409,6 +409,17 @@
       "theme": "wonder",
       "season": "Autumn",
       "createdAt": "2025-10-14T16:49:23.185Z",
+      "version": "2.0"
+    },
+    {
+      "file": "2025-10-15.json",
+      "id": "devotional-2025-10-15",
+      "date": "2025-10-15",
+      "title": "The Heavens Declare",
+      "location": "Macon, Georgia",
+      "theme": "wonder",
+      "season": "Autumn",
+      "createdAt": "2025-10-15T08:31:31.705Z",
       "version": "2.0"
     }
   ]
