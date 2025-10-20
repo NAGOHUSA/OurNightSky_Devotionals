@@ -1,5 +1,5 @@
 # .github/workflows/generate-our-night-sky.yml
-name: Generate Our Night Sky Devotional (v2)
+name: Generate Our Night Sky Devotional (v3)
 
 on:
   schedule:
