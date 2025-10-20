@@ -1,5 +1,5 @@
 # .github/workflows/generate-our-night-sky.yml
-name: Generate Our Night Sky Devotional (v3)
+name: Generate Our Night Sky Devotional (v4)
 
 on:
   schedule:
@@ -49,6 +49,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          set -euo pipefail
           if [ -f package-lock.json ]; then
             npm ci
           else
@@ -61,11 +62,13 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
+          set -euo pipefail
           mkdir -p devotionals
           node generate-our-night-sky.js
 
       - name: Verify output exists for today (UTC)
         run: |
+          set -euo pipefail
           TODAY=$(date -u +'%Y-%m-%d')
           if [ ! -f "devotionals/${TODAY}.json" ]; then
             echo "Expected devotionals/${TODAY}.json was not produced."
@@ -75,13 +78,10 @@ jobs:
 
       - name: Duplicate guard vs yesterday (defense-in-depth)
         run: |
+          set -euo pipefail
           TODAY=$(date -u +'%Y-%m-%d')
-          # portable "yesterday" (falls back to Python if needed)
-          YESTERDAY=$(date -u -d "yesterday" +'%Y-%m-%d' 2>/dev/null || python - <<'PY'
-from datetime import datetime, timedelta, timezone
-print((datetime.now(timezone.utc)-timedelta(days=1)).strftime('%Y-%m-%d'))
-PY
-)
+          # Ubuntu runners use GNU date, so this works:
+          YESTERDAY=$(date -u -d "yesterday" +'%Y-%m-%d')
           if [ -f "devotionals/${YESTERDAY}.json" ]; then
             CURR_HASH=$(sha256sum "devotionals/${TODAY}.json" | cut -d' ' -f1)
             PREV_HASH=$(sha256sum "devotionals/${YESTERDAY}.json" | cut -d' ' -f1)
@@ -94,7 +94,7 @@ PY
 
       - name: Commit & push if changed (with rebase + retries)
         run: |
-          set -e
+          set -euo pipefail
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
