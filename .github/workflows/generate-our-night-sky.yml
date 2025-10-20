@@ -38,11 +38,11 @@ jobs:
           TZ: "UTC"
         run: |
           set -e
-          if [ ! -f "./generate-devotional.js" ]; then
-            echo "Missing ./generate-devotional.js at repo root."
+          if [ ! -f "./generate-our-night-sky.js" ]; then
+            echo "Missing ./generate-our-night-sky.js at repo root."
             exit 1
           fi
-          node ./generate-devotional.js
+          node ./generate-our-night-sky.js
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
