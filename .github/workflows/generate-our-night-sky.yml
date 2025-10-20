@@ -1,68 +1,64 @@
-// generate-devotional.js
-// Our Night Sky — Daily devotional generator with local fallback
-// Place this file in your REPO ROOT (same level as package.json and devotionals/)
-
-const fs = require("fs");
-const path = require("path");
-
-// ---------- HELPERS ----------
-function todayUTC() {
-  const d = new Date();
-  const yyyy = d.getUTCFullYear();
-  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(d.getUTCDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
-function ensureDir(p) {
-  fs.mkdirSync(p, { recursive: true });
-}
-
-// ---------- FALLBACK DEVOTIONAL ----------
-function fallbackMarkdown(dateStr) {
-  return `# Our Night Sky — ${dateStr}
-
-## Scripture
-"The heavens declare the glory of God; the skies proclaim the work of his hands." — Psalm 19:1
-
-## Reflection
-Even when clouds hide the stars, God’s handiwork remains. Let tonight remind us that faith often shines brightest in the unseen.
-
-## Prayer
-Lord, steady my steps and lift my gaze. As the night sky displays Your majesty, anchor my heart in Your constant light. Amen.
-
-## Celestial Connection
-• Moon: (placeholder)
-• Visible Planets: (placeholder)
-• Note: Replace this with live sky data if you integrate astronomy APIs later.
-`;
-}
-
-// ---------- MAIN EXECUTION ----------
-(async function main() {
-  try {
-    const dateStr = todayUTC();
-    const outDir = path.join(process.cwd(), "devotionals");
-    ensureDir(outDir);
-
-    // Placeholder for AI generation logic:
-    // Try Groq, then OpenAI, then DeepSeek (coming later)
-    const content = fallbackMarkdown(dateStr);
-
-    const json = {
-      app: "Our Night Sky",
-      date: dateStr,
-      provider: "local-fallback",
-      model: "none",
-      hemisphere: "Northern",
-      location: null,
-      content_markdown: content,
-    };
-
-    const outPath = path.join(outDir, `${dateStr}.json`);
-    fs.writeFileSync(outPath, JSON.stringify(json, null, 2), "utf8");
-    console.log(`✅ Generated devotional file: ${outPath}`);
-  } catch (err) {
-    console.error("❌ Error generating devotional:", err);
-    process.exit(1);
-  }
-})();
+name: Generate Our Night Sky Devotional
+on:
+  schedule:
+    - cron: "0 9 * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: ons-devotional-pipeline
+  cancel-in-progress: false
+jobs:
+  generate-devotional:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install deps if present
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci || npm i
+          elif [ -f package.json ]; then
+            npm i
+          else
+            echo "No package.json found."
+          fi
+      - name: Generate devotional
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          TZ: "UTC"
+        run: |
+          set -e
+          if [ ! -f "./generate-devotional.js" ]; then
+            echo "Missing ./generate-devotional.js at repo root."
+            exit 1
+          fi
+          node ./generate-devotional.js
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Commit changes if any
+        run: |
+          set -e
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: devotional for $(date -u +'%Y-%m-%d') [ci]"
+      - name: Rebase and push safely
+        run: |
+          set -e
+          git fetch origin main
+          git rebase origin/main || (git rebase --abort && exit 1)
+          git push origin HEAD:main || git push --force-with-lease origin HEAD:main
