@@ -21,7 +21,7 @@ jobs:
 
     env:
       # ---- App config (edit as you like) ----
-      ONS_LOCATION: "Macon, Georgia"
+      ONS_LOCATION: "USA"
       ONS_THEME_DEFAULT: "wonder"
 
       # ---- Provider bases & models (override if needed) ----
