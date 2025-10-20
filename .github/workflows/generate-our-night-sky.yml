@@ -2,7 +2,7 @@ name: Generate Our Night Sky Devotional
 
 on:
   schedule:
-    # Runs at 09:00 UTC daily (≈ 4:00 AM during EST, 5:00 AM during EDT)
+    # 09:00 UTC daily (≈ 4:00 AM EST / 5:00 AM EDT)
     - cron: "0 9 * * *"
   workflow_dispatch: {}
 
@@ -36,92 +36,23 @@ jobs:
           elif [ -f package.json ]; then
             npm i
           else
-            echo "No package.json found; continuing without npm install."
+            echo "No package.json found; continuing."
           fi
 
-      - name: Locate or create generator script
-        run: |
-          set -euo pipefail
-          # Preferred locations
-          for f in ./generate-devotional.js ./scripts/generate-devotional.js ./tools/generate-devotional.js ./ci/generate-devotional.js; do
-            if [ -f "$f" ]; then
-              echo "GEN_SCRIPT=$f" >> $GITHUB_ENV
-              echo "Found generator at: $f"
-              exit 0
-            fi
-          done
-
-          echo "No generator found; creating minimal fallback at ./generate-devotional.js"
-          cat > ./generate-devotional.js <<'JS'
-const fs = require('fs');
-const path = require('path');
-
-function todayUTC() {
-  const d = new Date();
-  const yyyy = d.getUTCFullYear();
-  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const dd = String(d.getUTCDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-}
-function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
-
-(async function main() {
-  const dateStr = todayUTC();
-  const outDir = path.join(process.cwd(), 'devotionals');
-  ensureDir(outDir);
-
-  const content = `# Our Night Sky — ${dateStr}
-
-## Scripture
-"The heavens declare the glory of God; the skies proclaim the work of his hands." — Psalm 19:1
-
-## Reflection
-Placeholder devotional (no AI provider ran). Replace with your AI output.
-
-## Prayer
-Lord, open our eyes to Your creation. Amen.
-
-## Celestial Connection
-• Moon: (placeholder)
-• Visible Planets: (placeholder)
-`;
-
-  const json = {
-    app: "Our Night Sky",
-    date: dateStr,
-    provider: "local-fallback",
-    model: "none",
-    hemisphere: "Northern",
-    location: null,
-    content_markdown: content
-  };
-
-  const outPath = path.join(outDir, `${dateStr}.json`);
-  fs.writeFileSync(outPath, JSON.stringify(json, null, 2), 'utf8');
-  console.log(`Wrote ${outPath}`);
-})();
-JS
-          echo "GEN_SCRIPT=./generate-devotional.js" >> $GITHUB_ENV
-
-      - name: Generate devotional (with simple retry)
+      # IMPORTANT: keep generate-devotional.js in the repo root
+      - name: Generate devotional
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           TZ: "UTC"
         run: |
-          set -euo pipefail
-          echo "Using generator: ${GEN_SCRIPT}"
-          n=0
-          until [ $n -ge 3 ]
-          do
-            if node "${GEN_SCRIPT}"; then
-              break
-            fi
-            n=$((n+1))
-            echo "Retrying (${n}/3)..."
-            sleep 5
-          done
+          set -e
+          if [ ! -f "./generate-devotional.js" ]; then
+            echo "Missing ./generate-devotional.js. Add it to the repo root."
+            exit 1
+          fi
+          node ./generate-devotional.js
 
       - name: Configure git
         run: |
@@ -130,7 +61,7 @@ JS
 
       - name: Commit changes (if any)
         run: |
-          set -euo pipefail
+          set -e
           git add -A
           if git diff --cached --quiet; then
             echo "No changes to commit."
@@ -140,27 +71,7 @@ JS
 
       - name: Rebase on remote and push safely
         run: |
-          set -euo pipefail
+          set -e
           git fetch origin main
-
-          attempt=1
-          until [ $attempt -gt 3 ]
-          do
-            if git rebase origin/main; then
-              break
-            else
-              echo "Rebase attempt $attempt failed. Aborting and retrying..."
-              git rebase --abort || true
-              git fetch origin main
-              attempt=$((attempt+1))
-              sleep 2
-            fi
-          done
-
-          if git push origin HEAD:main; then
-            echo "Pushed without force."
-            exit 0
-          fi
-
-          echo "Normal push failed; attempting protected force push..."
-          git push --force-with-lease origin HEAD:main
+          git rebase origin/main || (git rebase --abort && exit 1)
+          git push origin HEAD:main || git push --force-with-lease origin HEAD:main
