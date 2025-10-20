@@ -2,10 +2,7 @@ name: Generate Our Night Sky Devotional
 
 on:
   schedule:
-    # 04:00 Eastern Time:
-    # - During EST (UTC-5): 09:00 UTC
-    # - During EDT (UTC-4): 08:00 UTC
-    # Pick one; keeping 09:00 UTC here to target 04:00 during EST.
+    # 04:00 Eastern (targets 09:00 UTC, which equals 04:00 during EST; 05:00 during EDT)
     - cron: "0 9 * * *"
   workflow_dispatch: {}
 
@@ -24,42 +21,112 @@ jobs:
       - name: Checkout repo (full history)
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
           fetch-depth: 0
+          persist-credentials: true
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install dependencies
+      - name: Install dependencies (if any)
         run: |
-          # Use lockfile if present; otherwise fall back to npm i
           if [ -f package-lock.json ]; then
             npm ci || npm i
-          else
+          elif [ -f package.json ]; then
             npm i
+          else
+            echo "No package.json found; continuing without npm install."
           fi
 
-      # ⬇️ Replace this step with your actual generation script/command(s)
-      - name: Generate devotional
+      - name: Locate generator script
+        id: locate
+        run: |
+          set -euo pipefail
+          # Search common locations for the generator
+          CANDIDATES=(
+            "./generate-devotional.js"
+            "./scripts/generate-devotional.js"
+            "./tools/generate-devotional.js"
+            "./ci/generate-devotional.js"
+          )
+          for f in "${CANDIDATES[@]}"; do
+            if [ -f "$f" ]; then
+              echo "GEN_SCRIPT=$f" >> $GITHUB_ENV
+              echo "Found generator at: $f"
+              exit 0
+            fi
+          done
+          echo "::warning title=Generator Missing::No generator found; using fallback ./generate-devotional.js"
+          # Optional: create a minimal fallback if it's truly missing
+          if [ ! -f "./generate-devotional.js" ]; then
+            cat > ./generate-devotional.js <<'EOF'
+const fs = require('fs');
+const path = require('path');
+
+function todayUTC() {
+  const d = new Date();
+  const yyyy = d.getUTCFullYear();
+  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(d.getUTCDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
+
+const dateStr = todayUTC();
+const outDir = path.join(process.cwd(), 'devotionals');
+ensureDir(outDir);
+
+const data = {
+  app: "Our Night Sky",
+  date: dateStr,
+  provider: "local-fallback",
+  model: "none",
+  hemisphere: "Northern",
+  location: null,
+  content_markdown: `# Our Night Sky — ${dateStr}
+
+## Scripture
+"The heavens declare the glory of God; the skies proclaim the work of his hands." — Psalm 19:1
+
+## Reflection
+A placeholder devotional was generated because no AI provider ran. Replace this with AI output as needed.
+
+## Prayer
+Lord, open our eyes to the wonder of Your creation and guide our steps by Your light. Amen.
+
+## Celestial Connection
+• Moon: (placeholder)
+• Visible Planets: (placeholder)
+• Note: Replace this with live sky data if desired.
+`,
+};
+
+const outPath = path.join(outDir, `${dateStr}.json`);
+fs.writeFileSync(outPath, JSON.stringify(data, null, 2), 'utf8');
+console.log(`Wrote ${outPath}`);
+EOF
+          fi
+          echo "GEN_SCRIPT=./generate-devotional.js" >> $GITHUB_ENV
+
+      - name: Generate devotional (with simple retry)
         env:
-          # Add any API keys here via repo secrets, e.g.:
-          # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          # GROQ_API_KEY:   ${{ secrets.GROQ_API_KEY }}
-          # DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           TZ: "UTC"
         run: |
           set -euo pipefail
-          # Example run with basic retry (adjust to your script name/args)
+          echo "Using generator: ${GEN_SCRIPT}"
           n=0
           until [ $n -ge 3 ]
           do
-            if node generate-devotional.js; then
+            if node "${GEN_SCRIPT}"; then
               break
             fi
             n=$((n+1))
-            echo "Retrying generate-devotional.js ($n/3)..."
+            echo "Retrying (${n}/3)..."
             sleep 5
           done
 
@@ -74,19 +141,15 @@ jobs:
           git add -A
           if git diff --cached --quiet; then
             echo "No changes to commit."
-            echo "::notice title=Devotional::No changes detected; skipping commit."
             exit 0
           fi
-          # Use the repo's timezone/date if you prefer; this uses UTC.
           git commit -m "chore: devotional for $(date -u +'%Y-%m-%d') [ci]"
 
       - name: Rebase on remote and push safely
         run: |
           set -euo pipefail
-          # Make sure we're up-to-date, then rebase our new commit(s)
           git fetch origin main
 
-          # Try the rebase up to 3 times in case of a race with another run
           attempt=1
           until [ $attempt -gt 3 ]
           do
@@ -101,12 +164,10 @@ jobs:
             fi
           done
 
-          # First try a normal push
           if git push origin HEAD:main; then
             echo "Pushed without force."
             exit 0
           fi
 
-          # If history moved during our rebase window, use force-with-lease for safety
           echo "Normal push failed; attempting protected force push..."
           git push --force-with-lease origin HEAD:main
