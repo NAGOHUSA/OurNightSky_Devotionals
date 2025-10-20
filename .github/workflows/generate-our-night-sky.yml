@@ -1,5 +1,5 @@
 # .github/workflows/generate-our-night-sky.yml
-name: Generate Our Night Sky Devotional (v4)
+name: Generate Our Night Sky Devotional (v2-fixed)
 
 on:
   schedule:
@@ -24,14 +24,22 @@ jobs:
       ONS_LOCATION: "USA"
       ONS_THEME_DEFAULT: "wonder"
 
-      # ---- Provider bases & models (override if needed) ----
+      # ---- Provider bases & models ----
+      # Groq (OpenAI-compatible)
       GROQ_API_BASE: "https://api.groq.com/openai/v1"
-      OPENAI_API_BASE: "https://api.openai.com/v1"
-      DEEPSEEK_API_BASE: "https://api.deepseek.com/v1"
-
       GROQ_MODEL: "llama-3.1-8b-instant"
+
+      # OpenAI
+      OPENAI_API_BASE: "https://api.openai.com/v1"
       OPENAI_MODEL: "gpt-4o-mini"
+
+      # DeepSeek
+      DEEPSEEK_API_BASE: "https://api.deepseek.com/v1"
       DEEPSEEK_MODEL: "deepseek-chat"
+
+      # (Optional) x.ai Grok — keep if your script still supports it
+      GROK_API_BASE: "https://api.x.ai/v1"
+      GROK_MODEL: "grok-2-latest"
 
       NODE_ENV: "production"
       FORCE_COLOR: "1"
@@ -56,15 +64,49 @@ jobs:
             npm i
           fi
 
+      # --- Ensure the runner actually sees the provider keys (masked) ---
+      - name: Check which provider keys are set (masked)
+        run: |
+          set -euo pipefail
+          for k in GROQ_API_KEY GROK_API_KEY OPENAI_API_KEY DEEPSEEK_API_KEY; do
+            if [ -n "${!k:-}" ]; then echo "$k = present"; else echo "$k = MISSING"; fi
+          done
+        env:
+          # Your real secrets
+          GROQ_API_KEY:     ${{ secrets.GROQ_API_KEY }}
+          OPENAI_API_KEY:   ${{ secrets.OPENAI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          # Back-compat mapping (if the script still looks for GROK_API_KEY)
+          GROK_API_KEY:     ${{ secrets.GROQ_API_KEY }}
+
+      - name: Jitter (avoid synchronized calls)
+        run: sleep $((RANDOM % 30))
+
       - name: Generate devotional
         env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          # Pass ALL provider keys
+          GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
+          OPENAI_API_KEY:     ${{ secrets.OPENAI_API_KEY }}
+          DEEPSEEK_API_KEY:   ${{ secrets.DEEPSEEK_API_KEY }}
+          # Back-compat for scripts using x.ai var name "GROK_*"
+          GROK_API_KEY:       ${{ secrets.GROQ_API_KEY }}
+          # Enable date-unique local fallback if ALL APIs fail
+          ALLOW_LOCAL_FALLBACK: "1"
         run: |
           set -euo pipefail
           mkdir -p devotionals
           node generate-our-night-sky.js
+
+      - name: List devotionals (debug)
+        run: |
+          set -euo pipefail
+          ls -la devotionals || true
+          TODAY=$(date -u +'%Y-%m-%d')
+          if [ -f "devotionals/${TODAY}.json" ]; then
+            echo "----- Head of today's file (${TODAY}.json) -----"
+            head -n 30 "devotionals/${TODAY}.json" || true
+            echo "-----------------------------------------------"
+          fi
 
       - name: Verify output exists for today (UTC)
         run: |
@@ -80,7 +122,6 @@ jobs:
         run: |
           set -euo pipefail
           TODAY=$(date -u +'%Y-%m-%d')
-          # Ubuntu runners use GNU date, so this works:
           YESTERDAY=$(date -u -d "yesterday" +'%Y-%m-%d')
           if [ -f "devotionals/${YESTERDAY}.json" ]; then
             CURR_HASH=$(sha256sum "devotionals/${TODAY}.json" | cut -d' ' -f1)
