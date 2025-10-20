@@ -2,8 +2,9 @@ name: Generate Our Night Sky Devotional (v2)
 
 on:
   schedule:
-    - cron: "0 8 * * *"   # 04:00 AM ET during DST (EDT = UTC-4)
-    - cron: "0 9 * * *"   # 04:00 AM ET during Standard Time (EST = UTC-5)
+    # 04:00 AM America/New_York
+    - cron: "0 8 * * *"   # EDT (UTC-4)
+    - cron: "0 9 * * *"   # EST (UTC-5)
   workflow_dispatch: {}
 
 jobs:
@@ -11,25 +12,24 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     env:
-      # Location & optional overrides
+      # App-level config
       ONS_LOCATION: "Macon, Georgia"
-      # ONS_DATE: "" # optionally pin a date (YYYY-MM-DD) for testing
+      ONS_THEME_DEFAULT: "wonder"
 
-      # Provider config (override models/bases if you need)
+      # Provider bases & models (override if needed)
       GROK_API_BASE: "https://api.x.ai/v1"
-      GROK_MODEL: "grok-2-mini"
-
       OPENAI_API_BASE: "https://api.openai.com/v1"
-      OPENAI_MODEL: "gpt-4o-mini"
-
       DEEPSEEK_API_BASE: "https://api.deepseek.com/v1"
+
+      GROK_MODEL: "grok-2-latest"
+      OPENAI_MODEL: "gpt-4o-mini"
       DEEPSEEK_MODEL: "deepseek-chat"
 
-      # Secrets (set in repo settings → Secrets and variables → Actions)
-      GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      # Node options
+      NODE_ENV: "production"
+      FORCE_COLOR: "1"
 
     steps:
       - name: Checkout
@@ -40,23 +40,59 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install (no deps required, but keep step handy)
-        run: npm ci --ignore-scripts || true
+      - name: Install deps
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm i
+          fi
 
-      - name: Generate devotional (v2 schema)
-        run: npm run generate
+      - name: Generate devotional
+        env:
+          # Secrets must be set in repo settings → Secrets and variables → Actions
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          mkdir -p devotionals
+          node generate-our-night-sky.js
 
-      - name: Update content tracker
-        run: npm run track
+      - name: Verify output exists
+        run: |
+          TODAY=$(date -u +'%Y-%m-%d')
+          if [ ! -f "devotionals/${TODAY}.json" ]; then
+            echo "Expected devotionals/${TODAY}.json was not produced."
+            exit 1
+          fi
+          echo "Found devotionals/${TODAY}.json"
 
-      - name: Commit & push
+      - name: Basic duplicate guard vs yesterday (defense-in-depth)
+        run: |
+          TODAY=$(date -u +'%Y-%m-%d')
+          YESTERDAY=$(date -u -d "yesterday" +'%Y-%m-%d') || YESTERDAY=$(python - <<'PY'
+from datetime import datetime, timedelta, timezone
+print((datetime.now(timezone.utc)-timedelta(days=1)).strftime('%Y-%m-%d'))
+PY
+)
+          if [ -f "devotionals/${YESTERDAY}.json" ]; then
+            CURR_HASH=$(sha256sum "devotionals/${TODAY}.json" | cut -d' ' -f1)
+            PREV_HASH=$(sha256sum "devotionals/${YESTERDAY}.json" | cut -d' ' -f1)
+            if [ "$CURR_HASH" = "$PREV_HASH" ]; then
+              echo "Duplicate content hash vs yesterday — failing to avoid publishing a repeat."
+              exit 1
+            fi
+          fi
+          echo "No hash-level duplicate detected."
+
+      - name: Commit & push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add devotionals content_tracker.json
+          git add devotionals
           if git diff --cached --quiet; then
             echo "No changes to commit."
-          else
-            git commit -m "chore: devotional for $(date -u +'%Y-%m-%d') [v2]"
-            git push
+            exit 0
           fi
+          git commit -m "chore: devotional for $(date -u +'%Y-%m-%d') [v2]"
+          git push
