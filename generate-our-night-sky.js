@@ -22,7 +22,7 @@ const DEEPSEEK_MODEL    = process.env.DEEPSEEK_MODEL || "deepseek-chat";
 const OPENAI_MODEL      = process.env.OPENAI_MODEL   || "gpt-4o-mini";
 const GROK_MODEL        = process.env.GROK_MODEL     || "grok-2-latest";
 
-const LOCATION          = process.env.ONS_LOCATION || "Macon, Georgia";
+const LOCATION          = process.env.ONS_LOCATION || "USA";
 const THEME_DEFAULT     = process.env.ONS_THEME_DEFAULT || "wonder";
 
 // ---- Dates & paths ----
