@@ -1,13 +1,13 @@
-# .github/workflows/generate-our-night-sky.yml
-name: Generate Our Night Sky Devotional (v2-fixed-rescue)
+name: Generate Our Night Sky Devotional (v2-fixed)
 
 on:
   schedule:
-    # 04:00 America/New_York (handles EDT/EST)
-    - cron: "0 8 * * *"   # EDT
-    - cron: "0 9 * * *"   # EST
+    # Run at 04:00 America/New_York year-round (handles EDT/EST by doubling)
+    - cron: "0 8 * * *"   # 04:00 when ET = UTC-4 (EDT)
+    - cron: "0 9 * * *"   # 04:00 when ET = UTC-5 (EST)
   workflow_dispatch: {}
 
+# Prevent overlapping runs from racing commits
 concurrency:
   group: devotional-${{ github.ref }}
   cancel-in-progress: false
@@ -23,7 +23,7 @@ jobs:
       ONS_LOCATION: "USA"
       ONS_THEME_DEFAULT: "wonder"
 
-      # ---- Provider bases/models ----
+      # ---- Provider bases & models ----
       # Groq (OpenAI-compatible)
       GROQ_API_BASE: "https://api.groq.com/openai/v1"
       GROQ_MODEL: "llama-3.1-8b-instant"
@@ -36,7 +36,7 @@ jobs:
       DEEPSEEK_API_BASE: "https://api.deepseek.com/v1"
       DEEPSEEK_MODEL: "deepseek-chat"
 
-      # Optional x.ai Grok (only if your script still supports it)
+      # (Optional) x.ai Grok — only if your script also supports it
       GROK_API_BASE: "https://api.x.ai/v1"
       GROK_MODEL: "grok-2-latest"
 
@@ -47,7 +47,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0   # required for rebase before push
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -63,6 +63,7 @@ jobs:
             npm i
           fi
 
+      # Show which keys made it to the runner (masked)
       - name: Check which provider keys are set (masked)
         run: |
           set -euo pipefail
@@ -73,7 +74,7 @@ jobs:
           GROQ_API_KEY:     ${{ secrets.GROQ_API_KEY }}
           OPENAI_API_KEY:   ${{ secrets.OPENAI_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          # Map Groq secret to legacy GROK var if your script still uses it
+          # Back-compat: map GROQ secret into GROK var if script still reads it
           GROK_API_KEY:     ${{ secrets.GROQ_API_KEY }}
 
       - name: Jitter (avoid synchronized calls)
@@ -81,107 +82,28 @@ jobs:
 
       - name: Generate devotional
         env:
+          # Pass provider keys
           GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
           OPENAI_API_KEY:     ${{ secrets.OPENAI_API_KEY }}
           DEEPSEEK_API_KEY:   ${{ secrets.DEEPSEEK_API_KEY }}
-          # Legacy mapping for x.ai var name if referenced
+          # Back-compat mapping for scripts that used GROK_*
           GROK_API_KEY:       ${{ secrets.GROQ_API_KEY }}
-          # Allow your script's local fallback path
+          # Enable unique local fallback if ALL APIs fail
           ALLOW_LOCAL_FALLBACK: "1"
         run: |
           set -euo pipefail
           mkdir -p devotionals
-          node generate-our-night-sky.js || true  # don't stop here; we'll rescue if needed
+          node generate-our-night-sky.js
 
       - name: List devotionals (debug)
         run: |
           set -euo pipefail
           ls -la devotionals || true
-
-      # ---- RESCUE: If today's file is still missing, synthesize a safe, date-unique fallback ----
-      - name: Rescue (create local fallback if missing)
-        run: |
-          set -euo pipefail
           TODAY=$(date -u +'%Y-%m-%d')
-          if [ ! -f "devotionals/${TODAY}.json" ]; then
-            echo "Rescue: creating local fallback for ${TODAY}"
-            node - <<'NODE'
-              const fs = require('fs');
-              const path = require('path');
-              const crypto = require('crypto');
-
-              const TODAY = new Date().toISOString().slice(0,10);
-              const OUT_DIR = path.join(process.cwd(), "devotionals");
-              const OUT_FILE = path.join(OUT_DIR, `${TODAY}.json`);
-              if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
-
-              // Rough moon phase estimator
-              function phase(dateStr){
-                const d = new Date(dateStr + "T00:00:00Z");
-                const knownNew = new Date("2025-09-03T00:00:00Z");
-                const days = (d - knownNew)/86400000;
-                const p = ((days % 29.53) + 29.53) % 29.53;
-                if (p < 1.0) return "New";
-                if (p < 6.4) return "Waxing Crescent";
-                if (p < 8.9) return "First Quarter";
-                if (p < 14.8) return "Waxing Gibbous";
-                if (p < 15.8) return "Full";
-                if (p < 22.1) return "Waning Gibbous";
-                if (p < 24.7) return "Last Quarter";
-                return "Waning Crescent";
-              }
-              function pick(arr, seed){
-                return arr[seed % arr.length];
-              }
-              const seeds = [
-                {ref:"Psalm 19:1", tag:"Glory"},
-                {ref:"Psalm 8:3-4", tag:"Wonder"},
-                {ref:"Isaiah 40:26", tag:"Strength"},
-                {ref:"Genesis 1:16", tag:"Creation"},
-                {ref:"Philippians 2:15", tag:"Shine"},
-                {ref:"James 1:17", tag:"Gifts"},
-              ];
-              const constellations = ["Cassiopeia","Andromeda","Cygnus","Pegasus","Perseus","Aquarius","Capricornus","Pisces"];
-              const planetSets = [
-                ["Jupiter","Saturn"],
-                ["Venus","Jupiter"],
-                ["Mars","Jupiter"],
-                ["Saturn","Mars"],
-                ["Venus","Saturn"]
-              ];
-              const n = parseInt(crypto.createHash("sha256").update(TODAY).digest("hex").slice(0,8),16);
-              const seed = pick(seeds, n);
-              const cons = pick(constellations, n);
-              const planets = pick(planetSets, n);
-              const ph = phase(TODAY);
-              const title = `${seed.tag} in the Night`;
-              const scriptureReference = seed.ref;
-              const theme = (process.env.ONS_THEME_DEFAULT || "wonder");
-              const location = (process.env.ONS_LOCATION || "USA");
-              const content = `As we look up on ${TODAY}, the sky invites us to ${theme.toLowerCase()}. Even without a telescope, you can step outside, breathe, and notice the quiet order God set above us. Let this be your prayer: “Lord, tune my heart to see what You reveal in creation and to trust what You have promised in Your Word.”`;
-              const body = content.trim();
-              const id = crypto.createHash("sha256").update(`${TODAY}|${title}|${scriptureReference}|${body}`).digest("hex").slice(0,32);
-              const out = {
-                app: "Our Night Sky",
-                id,
-                date: TODAY,
-                title,
-                scriptureReference,
-                content: body,
-                celestialConnection: `Under ${cons} and a ${ph} Moon, we remember ${scriptureReference} in ${location}.`,
-                theme,
-                moonPhase: ph.includes(" ") ? ph.split(" ")[0] : ph,
-                visiblePlanets: planets,
-                createdAt: new Date().toISOString(),
-                usedProvider: null,
-                isFallback: true,
-                fallbackType: "rescue"
-              };
-              fs.writeFileSync(OUT_FILE, JSON.stringify(out, null, 2), "utf8");
-              console.log("Rescue wrote:", OUT_FILE);
-            NODE
-          else
-            echo "Rescue not needed; today's file already exists."
+          if [ -f "devotionals/${TODAY}.json" ]; then
+            echo "----- Head of today's file (${TODAY}.json) -----"
+            head -n 30 "devotionals/${TODAY}.json" || true
+            echo "-----------------------------------------------"
           fi
 
       - name: Verify output exists for today (UTC)
@@ -212,11 +134,33 @@ jobs:
       - name: Commit & push if changed (with rebase + retries)
         run: |
           set -euo pipefail
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add devotionals
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "chore: devotional for $(date -u +'%Y-%m
+
+          git commit -m "chore: devotional for $(date -u +'%Y-%m-%d') [v2]"
+
+          # Rebase our commit(s) on top of the latest remote to avoid non-fast-forward errors
+          git fetch origin main
+          git rebase origin/main || { echo "Rebase failed."; git rebase --abort; exit 1; }
+
+          # Push with up to 3 retries in case another workflow landed between rebase and push
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              echo "Pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "Push attempt $attempt failed — refetch & rebase, then retry..."
+            git fetch origin main
+            git rebase origin/main || { echo "Rebase failed on retry."; git rebase --abort; exit 1; }
+            sleep $((attempt * 3))
+          done
+
+          echo "Push failed after retries."
+          exit 1
