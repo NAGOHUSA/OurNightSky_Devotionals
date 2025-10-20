@@ -2,7 +2,7 @@ name: Generate Our Night Sky Devotional
 
 on:
   schedule:
-    # 04:00 Eastern (targets 09:00 UTC, which equals 04:00 during EST; 05:00 during EDT)
+    # Runs at 09:00 UTC daily (≈ 4:00 AM during EST, 5:00 AM during EDT)
     - cron: "0 9 * * *"
   workflow_dispatch: {}
 
@@ -39,28 +39,20 @@ jobs:
             echo "No package.json found; continuing without npm install."
           fi
 
-      - name: Locate generator script
-        id: locate
+      - name: Locate or create generator script
         run: |
           set -euo pipefail
-          # Search common locations for the generator
-          CANDIDATES=(
-            "./generate-devotional.js"
-            "./scripts/generate-devotional.js"
-            "./tools/generate-devotional.js"
-            "./ci/generate-devotional.js"
-          )
-          for f in "${CANDIDATES[@]}"; do
+          # Preferred locations
+          for f in ./generate-devotional.js ./scripts/generate-devotional.js ./tools/generate-devotional.js ./ci/generate-devotional.js; do
             if [ -f "$f" ]; then
               echo "GEN_SCRIPT=$f" >> $GITHUB_ENV
               echo "Found generator at: $f"
               exit 0
             fi
           done
-          echo "::warning title=Generator Missing::No generator found; using fallback ./generate-devotional.js"
-          # Optional: create a minimal fallback if it's truly missing
-          if [ ! -f "./generate-devotional.js" ]; then
-            cat > ./generate-devotional.js <<'EOF'
+
+          echo "No generator found; creating minimal fallback at ./generate-devotional.js"
+          cat > ./generate-devotional.js <<'JS'
 const fs = require('fs');
 const path = require('path');
 
@@ -71,43 +63,44 @@ function todayUTC() {
   const dd = String(d.getUTCDate()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd}`;
 }
-
 function ensureDir(p) { fs.mkdirSync(p, { recursive: true }); }
 
-const dateStr = todayUTC();
-const outDir = path.join(process.cwd(), 'devotionals');
-ensureDir(outDir);
+(async function main() {
+  const dateStr = todayUTC();
+  const outDir = path.join(process.cwd(), 'devotionals');
+  ensureDir(outDir);
 
-const data = {
-  app: "Our Night Sky",
-  date: dateStr,
-  provider: "local-fallback",
-  model: "none",
-  hemisphere: "Northern",
-  location: null,
-  content_markdown: `# Our Night Sky — ${dateStr}
+  const content = `# Our Night Sky — ${dateStr}
 
 ## Scripture
 "The heavens declare the glory of God; the skies proclaim the work of his hands." — Psalm 19:1
 
 ## Reflection
-A placeholder devotional was generated because no AI provider ran. Replace this with AI output as needed.
+Placeholder devotional (no AI provider ran). Replace with your AI output.
 
 ## Prayer
-Lord, open our eyes to the wonder of Your creation and guide our steps by Your light. Amen.
+Lord, open our eyes to Your creation. Amen.
 
 ## Celestial Connection
 • Moon: (placeholder)
 • Visible Planets: (placeholder)
-• Note: Replace this with live sky data if desired.
-`,
-};
+`;
 
-const outPath = path.join(outDir, `${dateStr}.json`);
-fs.writeFileSync(outPath, JSON.stringify(data, null, 2), 'utf8');
-console.log(`Wrote ${outPath}`);
-EOF
-          fi
+  const json = {
+    app: "Our Night Sky",
+    date: dateStr,
+    provider: "local-fallback",
+    model: "none",
+    hemisphere: "Northern",
+    location: null,
+    content_markdown: content
+  };
+
+  const outPath = path.join(outDir, `${dateStr}.json`);
+  fs.writeFileSync(outPath, JSON.stringify(json, null, 2), 'utf8');
+  console.log(`Wrote ${outPath}`);
+})();
+JS
           echo "GEN_SCRIPT=./generate-devotional.js" >> $GITHUB_ENV
 
       - name: Generate devotional (with simple retry)
