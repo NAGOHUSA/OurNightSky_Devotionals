@@ -1,69 +1,94 @@
-function approxMoonPhaseISO(dateStr) {
-  // Very rough phase from date; 29.53-day synodic month
-  const d = new Date(dateStr + "T00:00:00Z");
-  const knownNew = new Date("2025-09-03T00:00:00Z"); // seed; adjust occasionally
-  const days = (d - knownNew) / 86400000;
-  const phase = ((days % 29.53) + 29.53) % 29.53;
-  if (phase < 1.0) return "New";
-  if (phase < 6.4) return "Waxing Crescent";
-  if (phase < 8.9) return "First Quarter";
-  if (phase < 14.8) return "Waxing Gibbous";
-  if (phase < 15.8) return "Full";
-  if (phase < 22.1) return "Waning Gibbous";
-  if (phase < 24.7) return "Last Quarter";
-  return "Waning Crescent";
+/**
+ * generate-our-night-sky.js
+ * Creates a devotional JSON for Our Night Sky.
+ */
+
+import fs from "fs";
+import path from "path";
+
+// === CONFIG ===
+const targetDate = process.env.TARGET_DATE || new Date().toISOString().slice(0, 10);
+const force = (process.env.FORCE_OVERWRITE || "false").toLowerCase() === "true";
+const outDir = "devotionals";
+if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+const outPath = path.join(outDir, `${targetDate}.json`);
+
+// === SAFETY ===
+if (fs.existsSync(outPath) && !force) {
+  console.log(`File already exists for ${targetDate}. Use FORCE_OVERWRITE=true to replace.`);
+  process.exit(0);
 }
 
-function pick(arr, i) { return arr[i % arr.length]; }
+// === AI CALLS (fallback chain) ===
+import fetch from "node-fetch";
 
-function localFallbackDevotional({dateUTC, location, theme}) {
-  const seeds = [
-    {ref:"Psalm 19:1", tag:"Glory"},
-    {ref:"Psalm 8:3-4", tag:"Wonder"},
-    {ref:"Isaiah 40:26", tag:"Strength"},
-    {ref:"Genesis 1:16", tag:"Creation"},
-    {ref:"Philippians 2:15", tag:"Shine"},
-    {ref:"James 1:17", tag:"Gifts"},
-  ];
-  const constellations = ["Cassiopeia","Andromeda","Cygnus","Pegasus","Perseus","Aquarius","Capricornus","Pisces"];
-  const planetsSets = [
-    ["Jupiter","Saturn"],
-    ["Venus","Jupiter"],
-    ["Mars","Jupiter"],
-    ["Saturn","Mars"],
-    ["Venus","Saturn"],
-  ];
-  const n = parseInt(crypto.createHash("sha256").update(dateUTC).digest("hex").slice(0,8),16);
-  const seed = pick(seeds, n);
-  const cons = pick(constellations, n);
-  const visPlanets = pick(planetsSets, n);
-  const phase = approxMoonPhaseISO(dateUTC);
+async function callAI(provider, body) {
+  try {
+    const urls = {
+      openai: "https://api.openai.com/v1/chat/completions",
+      groq: "https://api.groq.com/openai/v1/chat/completions",
+      deepseek: "https://api.deepseek.com/v1/chat/completions",
+    };
+    const keys = {
+      openai: process.env.OPENAI_API_KEY,
+      groq: process.env.GROQ_API_KEY,
+      deepseek: process.env.DEEPSEEK_API_KEY,
+    };
+    const res = await fetch(urls[provider], {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${keys[provider]}`,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`${provider} error ${res.status}`);
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content?.trim();
+  } catch (err) {
+    console.error(`❌ ${provider} failed:`, err.message);
+    return null;
+  }
+}
 
-  const title = `${seed.tag} in the Night`;
-  const scriptureReference = seed.ref;
-  const themeOut = theme || seed.tag.toLowerCase();
-  const celestialConnection = `Under ${cons} and a ${phase} Moon, we remember ${scriptureReference} in ${location}.`;
-  const content = `As we look up on ${dateUTC}, the sky invites us to ${themeOut.toLowerCase()}.
-Even without a telescope, you can step outside, breathe, and notice the quiet order God set above us.
-Let this be your prayer: “Lord, tune my heart to see what You reveal in creation and to trust what You have promised in Your Word.”`;
-
-  const body = content.replace(/\n+/g," ").trim();
-  const id = crypto.createHash("sha256").update(`${dateUTC}|${title}|${scriptureReference}|${body}`).digest("hex").slice(0,32);
-
-  return {
-    app: "Our Night Sky",
-    id,
-    date: dateUTC,
-    title,
-    scriptureReference,
-    content: body,
-    celestialConnection,
-    theme: themeOut,
-    moonPhase: phase.includes(" ") ? phase.split(" ")[0] : phase,
-    visiblePlanets: visPlanets,
-    createdAt: new Date().toISOString(),
-    usedProvider: null,
-    isFallback: true,
-    fallbackType: "local"
+async function generate() {
+  const prompt = `
+You are to write a short daily Christian devotional for an app called "Our Night Sky."
+Blend scripture with current celestial or seasonal themes, keeping it encouraging and uplifting.
+Output in Markdown, with sections:
+# Title
+## Scripture
+## Reflection
+## Prayer
+`;
+  const body = {
+    model: "gpt-4o-mini",
+    messages: [{ role: "user", content: prompt }],
+    max_tokens: 500,
+    temperature: 0.8,
   };
+
+  let content =
+    (await callAI("groq", body)) ||
+    (await callAI("openai", body)) ||
+    (await callAI("deepseek", body));
+
+  if (!content) {
+    console.error("All providers failed — cannot generate content.");
+    process.exit(1);
+  }
+
+  const payload = {
+    app: "Our Night Sky",
+    date: targetDate,
+    provider: "multi-fallback",
+    words: content.split(/\s+/).length,
+    hemisphere: "Northern",
+    content_markdown: content,
+  };
+
+  fs.writeFileSync(outPath, JSON.stringify(payload, null, 2));
+  console.log(`✅ Wrote devotional to ${outPath}`);
 }
+
+await generate();
