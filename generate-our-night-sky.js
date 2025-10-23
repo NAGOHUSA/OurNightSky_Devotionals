@@ -34,6 +34,13 @@ async function callAI(provider, body) {
       groq: process.env.GROQ_API_KEY,
       deepseek: process.env.DEEPSEEK_API_KEY,
     };
+    
+    if (!keys[provider]) {
+      console.log(`⚠️  ${provider} API key not configured, skipping...`);
+      return null;
+    }
+    
+    console.log(`🔄 Trying ${provider}...`);
     const res = await fetch(urls[provider], {
       method: "POST",
       headers: {
@@ -42,9 +49,21 @@ async function callAI(provider, body) {
       },
       body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error(`${provider} error ${res.status}`);
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`${provider} error ${res.status}: ${errorText}`);
+    }
+    
     const data = await res.json();
-    return data.choices?.[0]?.message?.content?.trim();
+    const content = data.choices?.[0]?.message?.content?.trim();
+    
+    if (content) {
+      console.log(`✅ ${provider} succeeded!`);
+      return content;
+    }
+    
+    throw new Error(`${provider} returned empty content`);
   } catch (err) {
     console.error(`❌ ${provider} failed:`, err.message);
     return null;
@@ -61,17 +80,34 @@ Output in Markdown, with sections:
 ## Reflection
 ## Prayer
 `;
-  const body = {
-    model: "gpt-4o-mini",
+
+  // Each provider needs its own model configuration
+  const groqBody = {
+    model: "llama-3.3-70b-versatile", // Groq's fastest model
     messages: [{ role: "user", content: prompt }],
     max_tokens: 500,
     temperature: 0.8,
   };
 
+  const openaiBody = {
+    model: "gpt-4o-mini", // OpenAI's efficient model
+    messages: [{ role: "user", content: prompt }],
+    max_tokens: 500,
+    temperature: 0.8,
+  };
+
+  const deepseekBody = {
+    model: "deepseek-chat", // DeepSeek's chat model
+    messages: [{ role: "user", content: prompt }],
+    max_tokens: 500,
+    temperature: 0.8,
+  };
+
+  // Try providers in order: Groq (free tier is generous) → OpenAI → DeepSeek
   let content =
-    (await callAI("groq", body)) ||
-    (await callAI("openai", body)) ||
-    (await callAI("deepseek", body));
+    (await callAI("groq", groqBody)) ||
+    (await callAI("openai", openaiBody)) ||
+    (await callAI("deepseek", deepseekBody));
 
   if (!content) {
     console.error("All providers failed — cannot generate content.");
