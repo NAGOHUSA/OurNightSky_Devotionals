@@ -98,25 +98,37 @@ jobs:
           set -e
           D="${{ steps.date.outputs.value }}"
           mkdir -p devotionals
+          TARGET_PATH="./devotionals/$D.json"
+          
+          # Check if file already exists in the correct location
+          if [ -f "$TARGET_PATH" ]; then
+            echo "✅ File already in correct location: $TARGET_PATH"
+            echo "out=devotionals/$D.json" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          
+          # Look for the file in alternative locations
           CANDIDATES=$(printf "%s\n" \
-            "./devotionals/$D.json" \
             "./$D.json" \
             "$(find . -maxdepth 3 -type f -name "*$D*.json" -print | tr '\n' ' ')")
+          
           FOUND=""
           for f in $CANDIDATES; do
-            if [ -f "$f" ]; then
+            if [ -f "$f" ] && [ "$f" != "$TARGET_PATH" ]; then
               FOUND="$f"
               break
             fi
           done
+          
           if [ -z "$FOUND" ]; then
-            echo "Expected ./devotionals/$D.json or ./$D.json (or *$D*.json), but none found."
+            echo "❌ Expected devotional file not found in any location"
             exit 1
           fi
-          echo "Found output at: $FOUND"
-          cp -f "$FOUND" "./devotionals/$D.json"
+          
+          echo "📦 Moving from $FOUND to $TARGET_PATH"
+          mv -f "$FOUND" "$TARGET_PATH"
           echo "out=devotionals/$D.json" >> "$GITHUB_OUTPUT"
-          echo "Normalized to devotionals/$D.json"
+          echo "✅ Normalized to devotionals/$D.json"
 
       - name: Configure git
         run: |
