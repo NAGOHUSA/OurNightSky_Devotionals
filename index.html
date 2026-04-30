@@ -6,6 +6,16 @@
 <title>Our Night Sky Devotions · Nebula Reflections</title>
 <meta name="description" content="Daily devotionals veiled in cosmic wonder — live sky weather, random nebula imagery, and scripture from the stars.">
 <meta name="theme-color" content="#02040c">
+<!-- Open Graph / Social Media Share Card -->
+<meta property="og:title" content="Our Night Sky Devotions">
+<meta property="og:description" content="Daily celestial devotionals — scripture, reflection, and prayer under the stars.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ournightsky.us">
+<meta property="og:image" content="https://images.pexels.com/photos/47367/andromeda-galaxy-stars-night-sky-47367.jpeg?auto=compress&cs=tinysrgb&w=1200&h=630&fit=crop">
+<meta property="og:image:alt" content="Starry night sky devotional">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Our Night Sky Devotions">
+<meta name="twitter:description" content="Daily celestial devotionals — scripture, reflection, and prayer under the stars.">
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
@@ -202,12 +212,43 @@ body {
 .celestial-badge {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.badge-left {
+  display: flex;
+  align-items: center;
   gap: 8px;
   font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--nebula-cyan);
-  margin-bottom: 1rem;
+}
+.share-buttons {
+  display: flex;
+  gap: 8px;
+}
+.share-icon {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 30px;
+  padding: 6px 12px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-mist);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.share-icon:hover {
+  background: rgba(199, 125, 255, 0.2);
+  border-color: var(--nebula-pink);
+  color: var(--star-gold);
+  transform: translateY(-1px);
 }
 .star-date {
   font-family: 'Space Mono', monospace;
@@ -413,6 +454,26 @@ body {
   border-top: 1px solid rgba(100, 120, 200, 0.2);
   padding-top: 1.5rem;
 }
+.share-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(30, 40, 70, 0.95);
+  backdrop-filter: blur(16px);
+  padding: 10px 20px;
+  border-radius: 60px;
+  font-size: 0.75rem;
+  color: var(--star-gold);
+  border: 1px solid var(--nebula-pink);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.share-toast.show {
+  transform: translateX(-50%) translateY(0);
+}
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: #030614; }
 ::-webkit-scrollbar-thumb { background: #4d6bcf; border-radius: 10px; }
@@ -435,7 +496,6 @@ body {
     </div>
   </div>
 
-  <!-- Random Cosmic Image Banner (working nebula/galaxy images) -->
   <div class="nebula-image-banner" id="nebulaBanner">
     <img id="cosmicImage" class="cosmic-img" src="https://images.pexels.com/photos/47367/andromeda-galaxy-stars-night-sky-47367.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="nebula vision">
     <div class="image-credit" id="imageCredit">✨ celestial canvas · random nebula</div>
@@ -443,7 +503,14 @@ body {
 
   <div class="main-cosmic-grid">
     <div class="devotional-core" id="devotionalCore">
-      <div class="celestial-badge"><i class="fas fa-star-of-life"></i> TODAY'S CELESTIAL MEDITATION</div>
+      <div class="celestial-badge">
+        <div class="badge-left"><i class="fas fa-star-of-life"></i> TODAY'S CELESTIAL MEDITATION</div>
+        <div class="share-buttons">
+          <button class="share-icon" id="shareTwitterBtn"><i class="fab fa-twitter"></i> Share</button>
+          <button class="share-icon" id="shareFacebookBtn"><i class="fab fa-facebook-f"></i> Share</button>
+          <button class="share-icon" id="shareCopyBtn"><i class="fas fa-link"></i> Copy</button>
+        </div>
+      </div>
       <div class="star-date" id="starDateDisplay">—— • ——</div>
       <div class="loader-glow" id="devotionalLoader"><i class="fas fa-circle-notch fa-spin"></i> drawing cosmic reflection...</div>
       <div id="devotionalContent" style="display: none;"></div>
@@ -482,13 +549,18 @@ body {
   <div class="footer-cosmic"><i class="fas fa-moon"></i> “Lift your eyes and see — who created these?” (Isaiah 40:26) • ournightsky.us</div>
 </div>
 
+<div id="shareToast" class="share-toast">✨ Link copied to clipboard!</div>
+
 <script>
   // ========== CONFIG & GLOBALS ==========
   const GITHUB_RAW = 'https://raw.githubusercontent.com/NAGOHUSA/OurNightSky_Devotionals/main/devotionals/';
   const GITHUB_API = 'https://api.github.com/repos/NAGOHUSA/OurNightSky_Devotionals/contents/devotionals';
   let archiveCache = [];
+  let currentDevotionalData = null;
+  let currentDevotionalDate = null;
+  let currentImageUrl = "https://images.pexels.com/photos/47367/andromeda-galaxy-stars-night-sky-47367.jpeg";
 
-  // ========== RELIABLE SPACE IMAGES (100% working URLs) ==========
+  // ========== RELIABLE SPACE IMAGES ==========
   const spaceImages = [
     "https://images.pexels.com/photos/47367/andromeda-galaxy-stars-night-sky-47367.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     "https://images.pexels.com/photos/1252890/pexels-photo-1252890.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
@@ -500,12 +572,7 @@ body {
     "https://cdn.pixabay.com/photo/2019/11/19/11/21/galaxy-4637390_1280.jpg",
     "https://cdn.pixabay.com/photo/2017/08/30/01/05/milky-way-2695569_1280.jpg",
     "https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616_1280.jpg",
-    "https://cdn.pixabay.com/photo/2015/02/12/14/06/nebula-634639_1280.jpg",
-    "https://cdn.pixabay.com/photo/2019/09/26/07/13/nebula-4505557_1280.jpg",
-    "https://cdn.pixabay.com/photo/2013/11/28/10/43/astronomy-220055_1280.jpg",
-    "https://cdn.pixabay.com/photo/2019/11/07/20/43/space-4610122_1280.jpg",
-    "https://cdn.pixabay.com/photo/2016/10/20/18/35/earth-1756274_1280.jpg",
-    "https://cdn.pixabay.com/photo/2017/08/22/11/56/space-2668085_1280.jpg"
+    "https://cdn.pixabay.com/photo/2015/02/12/14/06/nebula-634639_1280.jpg"
   ];
 
   function getRandomCosmicImage() {
@@ -516,24 +583,67 @@ body {
     const imgElement = document.getElementById('cosmicImage');
     const creditSpan = document.getElementById('imageCredit');
     if (!imgElement) return;
-    
     const imgUrl = getRandomCosmicImage();
+    currentImageUrl = imgUrl;
     imgElement.src = imgUrl;
-    
-    // Set credit based on source
     if (imgUrl.includes('pexels')) {
       creditSpan.innerHTML = "🌌 cosmic nebula · courtesy of Pexels";
-    } else if (imgUrl.includes('pixabay')) {
-      creditSpan.innerHTML = "✨ galaxy vision · Pixabay community";
     } else {
-      creditSpan.innerHTML = "🌟 celestial canvas · random deep space";
+      creditSpan.innerHTML = "✨ galaxy vision · Pixabay community";
     }
-    
-    // Fallback in case of any error
     imgElement.onerror = function() {
       this.src = "https://cdn.pixabay.com/photo/2019/11/19/11/21/galaxy-4637390_1280.jpg";
+      currentImageUrl = this.src;
       creditSpan.innerHTML = "🌌 celestial art · open source";
     };
+    updateOpenGraphImage();
+  }
+
+  function updateOpenGraphImage() {
+    let metaOgImage = document.querySelector('meta[property="og:image"]');
+    if (!metaOgImage) {
+      metaOgImage = document.createElement('meta');
+      metaOgImage.setAttribute('property', 'og:image');
+      document.head.appendChild(metaOgImage);
+    }
+    metaOgImage.setAttribute('content', currentImageUrl);
+  }
+
+  // ========== SHARING FUNCTIONALITY ==========
+  function showToast(message) {
+    const toast = document.getElementById('shareToast');
+    toast.textContent = message || '✨ Link copied to clipboard!';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function getShareText() {
+    if (!currentDevotionalData) return "Our Night Sky Devotions — Daily celestial reflections under the stars. https://ournightsky.us";
+    const title = currentDevotionalData.title || "Celestial Meditation";
+    const scripture = currentDevotionalData.scripture || "The heavens declare the glory of God";
+    const shortReflection = (currentDevotionalData.reflection || "").substring(0, 120);
+    return `✨ "${title}" — ${scripture}\n\n${shortReflection}...\n\nRead the full devotional at Our Night Sky Devotions ✨\nhttps://ournightsky.us`;
+  }
+
+  function shareToTwitter() {
+    const text = encodeURIComponent(getShareText());
+    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank', 'width=600,height=400');
+  }
+
+  function shareToFacebook() {
+    const url = encodeURIComponent('https://ournightsky.us');
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+  }
+
+  async function copyToClipboard() {
+    const shareText = getShareText();
+    try {
+      await navigator.clipboard.writeText(shareText + "\n\nhttps://ournightsky.us");
+      showToast("✨ Devotional link copied to clipboard!");
+    } catch (err) {
+      prompt("Copy this link:", "https://ournightsky.us");
+      showToast("📋 Press Ctrl+C to copy");
+    }
   }
 
   // ========== WEATHER + LOCATION ==========
@@ -589,6 +699,9 @@ body {
   function renderDevotional(data, dateStr) {
     const container = document.getElementById('devotionalContent');
     const loader = document.getElementById('devotionalLoader');
+    currentDevotionalData = data;
+    currentDevotionalDate = dateStr;
+    
     if (!data) {
       container.innerHTML = `<div class="reflection-text" style="text-align:center;"><i class="fas fa-comet"></i> Today's reflection awaits in stillness.<br>Explore archive entries.</div>`;
       loader.style.display = 'none';
@@ -617,6 +730,12 @@ body {
     `;
     loader.style.display = 'none';
     container.style.display = 'block';
+    
+    // Update OG title/desc for better share cards
+    let metaTitle = document.querySelector('meta[property="og:title"]');
+    if (metaTitle) metaTitle.setAttribute('content', `${title} — Our Night Sky Devotions`);
+    let metaDesc = document.querySelector('meta[property="og:description"]');
+    if (metaDesc) metaDesc.setAttribute('content', `${scripture.substring(0, 120)}...`);
   }
 
   async function loadTodayDevotional() {
@@ -671,19 +790,13 @@ body {
 
   function handleArchiveSearch() { renderArchiveList(document.getElementById('archiveSearchInput').value); }
   
-  function refreshEverything() {
-    loadArchiveIndex().then(()=>renderArchiveList(''));
-    loadTodayDevotional();
-    fetchLocalWeather();
-    loadRandomNebulaImage();
-    const now = new Date();
-    document.getElementById('starDateDisplay').innerHTML = now.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }).toUpperCase() + ' ✦ celestial hour';
-  }
-
   // ========== INIT ==========
   document.getElementById('searchArchiveBtn').addEventListener('click', handleArchiveSearch);
   document.getElementById('refreshArchiveBtn').addEventListener('click', ()=>{ loadArchiveIndex().then(()=>renderArchiveList('')); });
   document.getElementById('archiveSearchInput').addEventListener('keydown', e => { if(e.key === 'Enter') handleArchiveSearch(); });
+  document.getElementById('shareTwitterBtn').addEventListener('click', shareToTwitter);
+  document.getElementById('shareFacebookBtn').addEventListener('click', shareToFacebook);
+  document.getElementById('shareCopyBtn').addEventListener('click', copyToClipboard);
 
   (function init() {
     const now = new Date();
