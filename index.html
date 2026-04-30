@@ -17,8 +17,6 @@
 
 :root {
   --deep-space: #03050b;
-  --nebula-glow: #151e2f;
-  --nebula-core: #2f2b3c;
   --nebula-pink: #c77dff;
   --nebula-blue: #6c8dff;
   --nebula-cyan: #7ae9ff;
@@ -41,7 +39,6 @@ body {
   overflow-x: hidden;
 }
 
-/* NEBULA BACKGROUND */
 .space-nebula {
   position: fixed;
   inset: 0;
@@ -171,7 +168,6 @@ body {
   .cosmic-container { padding: 1rem; }
 }
 
-/* image cosmic banner */
 .nebula-image-banner {
   background: var(--glass-panel);
   backdrop-filter: blur(8px);
@@ -183,17 +179,16 @@ body {
 }
 .cosmic-img {
   width: 100%;
-  height: 200px;
+  height: 220px;
   object-fit: cover;
   display: block;
-  transition: transform 0.2s ease;
 }
 .image-credit {
   padding: 0.4rem 1rem;
   font-size: 0.55rem;
   text-align: right;
   color: var(--text-dim);
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.5);
   letter-spacing: 0.5px;
 }
 .devotional-core {
@@ -418,7 +413,6 @@ body {
   border-top: 1px solid rgba(100, 120, 200, 0.2);
   padding-top: 1.5rem;
 }
-i, .fas { color: inherit; }
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: #030614; }
 ::-webkit-scrollbar-thumb { background: #4d6bcf; border-radius: 10px; }
@@ -441,14 +435,13 @@ i, .fas { color: inherit; }
     </div>
   </div>
 
-  <!-- Random Cosmic Image Banner (Nebula / Galaxy) -->
+  <!-- Random Cosmic Image Banner (working nebula/galaxy images) -->
   <div class="nebula-image-banner" id="nebulaBanner">
-    <img id="cosmicImage" class="cosmic-img" src="https://picsum.photos/id/104/1200/300" alt="nebula vision">
+    <img id="cosmicImage" class="cosmic-img" src="https://images.pexels.com/photos/47367/andromeda-galaxy-stars-night-sky-47367.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="nebula vision">
     <div class="image-credit" id="imageCredit">✨ celestial canvas · random nebula</div>
   </div>
 
   <div class="main-cosmic-grid">
-    <!-- MAIN DEVOTIONAL -->
     <div class="devotional-core" id="devotionalCore">
       <div class="celestial-badge"><i class="fas fa-star-of-life"></i> TODAY'S CELESTIAL MEDITATION</div>
       <div class="star-date" id="starDateDisplay">—— • ——</div>
@@ -456,15 +449,12 @@ i, .fas { color: inherit; }
       <div id="devotionalContent" style="display: none;"></div>
     </div>
 
-    <!-- RIGHT SIDEBAR -->
     <div class="sidebar-cosmic">
-      <!-- Live Sky Weather -->
       <div class="weather-live-panel">
         <div class="panel-head"><i class="fas fa-meteor"></i> NIGHT SKY CONDITIONS</div>
         <div id="liveWeatherData"><div class="loader-glow"><i class="fas fa-spinner fa-pulse"></i> reading celestial winds...</div></div>
       </div>
 
-      <!-- Archive Nebula -->
       <div class="archive-nebula">
         <div class="panel-head"><i class="fas fa-scroll"></i> STAR ARCHIVE</div>
         <div class="archive-search">
@@ -475,7 +465,6 @@ i, .fas { color: inherit; }
         <button class="btn-cosmic" id="refreshArchiveBtn"><i class="fas fa-sync-alt"></i> &nbsp;REFRESH ARCHIVE</button>
       </div>
 
-      <!-- Support & Links Card -->
       <div class="support-card">
         <div class="panel-head"><i class="fas fa-heart"></i> SUPPORT THIS MINISTRY</div>
         <div class="support-links">
@@ -499,10 +488,15 @@ i, .fas { color: inherit; }
   const GITHUB_API = 'https://api.github.com/repos/NAGOHUSA/OurNightSky_Devotionals/contents/devotionals';
   let archiveCache = [];
 
-  // ---------- RANDOM NEBULA / GALAXY IMAGE (no APOD) ----------
-  // using high-quality free space image APIs + curated Unsplash space collections fallback + public domain
-  const spaceImageSources = [
-    // direct high-res nebula images from public domain / CC (Webb/ Hubble inspired but safe)
+  // ========== RELIABLE SPACE IMAGES (100% working URLs) ==========
+  const spaceImages = [
+    "https://images.pexels.com/photos/47367/andromeda-galaxy-stars-night-sky-47367.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    "https://images.pexels.com/photos/1252890/pexels-photo-1252890.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    "https://images.pexels.com/photos/1169754/pexels-photo-1169754.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    "https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    "https://images.pexels.com/photos/1324769/pexels-photo-1324769.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    "https://images.pexels.com/photos/1657977/pexels-photo-1657977.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    "https://images.pexels.com/photos/4029679/pexels-photo-4029679.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     "https://cdn.pixabay.com/photo/2019/11/19/11/21/galaxy-4637390_1280.jpg",
     "https://cdn.pixabay.com/photo/2017/08/30/01/05/milky-way-2695569_1280.jpg",
     "https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616_1280.jpg",
@@ -510,50 +504,45 @@ i, .fas { color: inherit; }
     "https://cdn.pixabay.com/photo/2019/09/26/07/13/nebula-4505557_1280.jpg",
     "https://cdn.pixabay.com/photo/2013/11/28/10/43/astronomy-220055_1280.jpg",
     "https://cdn.pixabay.com/photo/2019/11/07/20/43/space-4610122_1280.jpg",
-    "https://cdn.pixabay.com/photo/2012/11/21/10/24/star-66827_1280.jpg",
     "https://cdn.pixabay.com/photo/2016/10/20/18/35/earth-1756274_1280.jpg",
-    "https://cdn.pixabay.com/photo/2017/08/22/11/56/space-2668085_1280.jpg",
-    "https://cdn.pixabay.com/photo/2019/11/18/10/29/andromeda-4634713_1280.jpg",
-    "https://live.staticflickr.com/65535/53568486502_ca8806a3b2_h.jpg",  // Carina Nebula-like (CC)
-    "https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    "https://images.pexels.com/photos/1324769/pexels-photo-1324769.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    "https://images.pexels.com/photos/1169754/pexels-photo-1169754.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    "https://cdn.pixabay.com/photo/2017/08/22/11/56/space-2668085_1280.jpg"
   ];
-  // additional deep field galaxies (random from valid public domain sources)
-  const secondaryImages = [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Helix_Nebula.jpg/1024px-Helix_Nebula.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/e/e5/Orion_Nebula_-_Hubble_2006.jpg",
-    "https://www.nasa.gov/sites/default/files/thumbnails/image/hubble_helix_nebula.jpg"
-  ];
-  const allImages = [...spaceImageSources, ...secondaryImages];
-  
+
   function getRandomCosmicImage() {
-    const randomIndex = Math.floor(Math.random() * allImages.length);
-    return allImages[randomIndex];
+    return spaceImages[Math.floor(Math.random() * spaceImages.length)];
   }
 
   async function loadRandomNebulaImage() {
     const imgElement = document.getElementById('cosmicImage');
     const creditSpan = document.getElementById('imageCredit');
     if (!imgElement) return;
+    
     const imgUrl = getRandomCosmicImage();
     imgElement.src = imgUrl;
-    imgElement.onerror = () => {
-      // fallback to a safe pixabay nebula
-      imgElement.src = "https://cdn.pixabay.com/photo/2019/11/19/11/21/galaxy-4637390_1280.jpg";
-      creditSpan.innerText = "✨ celestial art · pixabay";
+    
+    // Set credit based on source
+    if (imgUrl.includes('pexels')) {
+      creditSpan.innerHTML = "🌌 cosmic nebula · courtesy of Pexels";
+    } else if (imgUrl.includes('pixabay')) {
+      creditSpan.innerHTML = "✨ galaxy vision · Pixabay community";
+    } else {
+      creditSpan.innerHTML = "🌟 celestial canvas · random deep space";
+    }
+    
+    // Fallback in case of any error
+    imgElement.onerror = function() {
+      this.src = "https://cdn.pixabay.com/photo/2019/11/19/11/21/galaxy-4637390_1280.jpg";
+      creditSpan.innerHTML = "🌌 celestial art · open source";
     };
-    creditSpan.innerHTML = "🌌 random nebula / galaxy · inspired by cosmic wonders";
   }
 
-  // ---------- WEATHER + LOCATION (live night sky) ----------
-  let userLat = null, userLon = null;
+  // ========== WEATHER + LOCATION ==========
   function computeMoonPhasePretty() {
     const date = new Date();
     const newMoonRef = new Date(2000, 0, 6, 18, 14).getTime();
     const lp = 2551443;
     const phase = ((date.getTime() - newMoonRef) / 1000 % lp) / lp;
-    const phases = ['🌑 New', '🌒 Waxing Crescent', '🌓 First Quarter', '🌔 Waxing Gibbous', '🌕 Full', '🌖 Waning Gibbous', '🌗 Last Quarter', '🌘 Waning Crescent'];
+    const phases = ['🌑 New Moon', '🌒 Waxing Crescent', '🌓 First Quarter', '🌔 Waxing Gibbous', '🌕 Full Moon', '🌖 Waning Gibbous', '🌗 Last Quarter', '🌘 Waning Crescent'];
     return phases[Math.floor(phase * 8)];
   }
 
@@ -566,9 +555,9 @@ i, .fas { color: inherit; }
         if (!navigator.geolocation) reject(new Error("no geolocation"));
         navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
       });
-      userLat = position.coords.latitude;
-      userLon = position.coords.longitude;
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${userLat}&longitude=${userLon}&current_weather=true&timezone=auto`;
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
       const res = await fetch(url);
       const data = await res.json();
       if (data.current_weather) {
@@ -580,11 +569,11 @@ i, .fas { color: inherit; }
         else if (w.weathercode >= 71 && w.weathercode <= 77) condition = "snow nebula";
         else if (w.weathercode >= 80 && w.weathercode <= 82) condition = "shower comets";
         else if (w.weathercode >= 95) condition = "storm aurora";
-        const moonPhaseStr = computeMoonPhasePretty();
+        const moonPhase = computeMoonPhasePretty();
         weatherDiv.innerHTML = `
           <div class="weather-temp">${Math.round(tempC)}°C</div>
           <div class="weather-condition"><i class="fas fa-wind"></i> ${condition} · wind ${Math.round(wind)} km/h</div>
-          <div class="moon-phase-micro"><span><i class="fas fa-moon"></i> ${moonPhaseStr}</span><span class="loc-text"><i class="fas fa-map-marker-alt"></i> ${userLat.toFixed(1)}°, ${userLon.toFixed(1)}°</span></div>
+          <div class="moon-phase-micro"><span><i class="fas fa-moon"></i> ${moonPhase}</span><span class="loc-text"><i class="fas fa-map-marker-alt"></i> ${lat.toFixed(1)}°, ${lon.toFixed(1)}°</span></div>
           <div style="font-size:0.6rem; margin-top:6px;">🌙 night sky observation</div>`;
         document.getElementById('weatherSummary').innerHTML = `${condition} ${Math.round(tempC)}°C`;
       } else throw new Error();
@@ -594,8 +583,9 @@ i, .fas { color: inherit; }
     }
   }
 
-  // ---------- DEVOTIONAL RENDER ----------
+  // ========== DEVOTIONAL RENDER ==========
   function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
+  
   function renderDevotional(data, dateStr) {
     const container = document.getElementById('devotionalContent');
     const loader = document.getElementById('devotionalLoader');
@@ -619,7 +609,6 @@ i, .fas { color: inherit; }
       const prMatch = md.match(/## Prayer\n([\s\S]*?)$/i);
       if (prMatch) prayer = prMatch[1].trim();
     }
-    const displayDate = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     container.innerHTML = `
       <div class="devotional-title">${escapeHtml(title)}</div>
       <div class="scripture-glow"><i class="fas fa-quote-left" style="opacity:0.6; margin-right:6px;"></i> ${escapeHtml(scripture)}</div>
@@ -639,7 +628,7 @@ i, .fas { color: inherit; }
     } catch(e) { renderDevotional(null, today); }
   }
 
-  // ---------- ARCHIVE ----------
+  // ========== ARCHIVE ==========
   async function loadArchiveIndex() {
     try {
       const resp = await fetch(GITHUB_API);
@@ -681,26 +670,30 @@ i, .fas { color: inherit; }
   }
 
   function handleArchiveSearch() { renderArchiveList(document.getElementById('archiveSearchInput').value); }
+  
   function refreshEverything() {
     loadArchiveIndex().then(()=>renderArchiveList(''));
     loadTodayDevotional();
     fetchLocalWeather();
     loadRandomNebulaImage();
-    document.getElementById('starDateDisplay').innerHTML = new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }).toUpperCase() + ' ✦ celestial hour';
+    const now = new Date();
+    document.getElementById('starDateDisplay').innerHTML = now.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }).toUpperCase() + ' ✦ celestial hour';
   }
 
+  // ========== INIT ==========
   document.getElementById('searchArchiveBtn').addEventListener('click', handleArchiveSearch);
   document.getElementById('refreshArchiveBtn').addEventListener('click', ()=>{ loadArchiveIndex().then(()=>renderArchiveList('')); });
   document.getElementById('archiveSearchInput').addEventListener('keydown', e => { if(e.key === 'Enter') handleArchiveSearch(); });
 
   (function init() {
-    document.getElementById('starDateDisplay').innerHTML = new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }).toUpperCase() + ' ✦ celestial hour';
+    const now = new Date();
+    document.getElementById('starDateDisplay').innerHTML = now.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }).toUpperCase() + ' ✦ celestial hour';
     loadRandomNebulaImage();
     fetchLocalWeather();
     loadTodayDevotional();
     loadArchiveIndex().then(()=>renderArchiveList(''));
     setInterval(() => { if(document.visibilityState === 'visible') fetchLocalWeather(); }, 12*60*1000);
-    setInterval(() => loadRandomNebulaImage(), 1800000); // change image each 30min if desired but random each refresh
+    setInterval(() => loadRandomNebulaImage(), 30*60*1000);
   })();
 </script>
 </body>
