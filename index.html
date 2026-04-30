@@ -2,234 +2,689 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OurNightSky · Heaven & Earth</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Barlow+Condensed:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/suncalc@1.8.0/suncalc.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>NEBULA DEVOTIONS · Cosmos & Creator</title>
+<meta name="description" content="Daily devotionals veiled in cosmic wonder — live sky weather, nebula breath, and scripture from the stars.">
+<meta name="theme-color" content="#02040c">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 :root {
-  --bg:#070910; --bg2:#0b0d18; --bg3:#0f121f;
-  --panel:#111422; --panel2:#161b2e;
-  --border:#1c2238; --border2:#243060;
-  --cyan:#00d4ff; --cyan2:#0088bb;
-  --green:#00e676; --green2:#00994d;
-  --amber:#ffb300; --amber2:#cc7700;
-  --purple:#b388ff; --purple2:#7b4fff;
-  --pink:#ff4081; --teal:#1de9b6;
-  --blue:#448aff; --red:#ff5252;
-  --text:#d8e0ff; --muted:#6070a0; --dim:#2d3a5a;
-  --scripture-gold: #ffd700;
+  --deep-space: #03050b;
+  --nebula-glow: #151e2f;
+  --nebula-core: #2f2b3c;
+  --nebula-pink: #c77dff;
+  --nebula-blue: #6c8dff;
+  --nebula-cyan: #7ae9ff;
+  --star-gold: #ffdf9c;
+  --star-silver: #cad6ff;
+  --text-luminous: #eef3ff;
+  --text-mist: #9aaac9;
+  --text-dim: #5a6c8c;
+  --border-glow: rgba(120, 150, 255, 0.2);
+  --glass-panel: rgba(5, 10, 25, 0.65);
+  --glass-border: rgba(100, 140, 255, 0.25);
+  --aurora-1: #4a2c8c;
+  --aurora-2: #2c5f8a;
 }
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
-body{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);display:flex;flex-direction:column}
 
-/* --- SCRIPTURE HERO SECTION --- */
-#scriptureHeader {
-  flex-shrink: 0;
-  background: linear-gradient(to bottom, #0a0e1a, var(--bg));
-  padding: 20px 20px;
-  text-align: center;
-  border-bottom: 1px solid var(--border2);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+body {
+  background: radial-gradient(ellipse at 30% 40%, #0a0f1c, #02040c);
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text-luminous);
   position: relative;
-  z-index: 100;
+  overflow-x: hidden;
 }
-.scripture-text {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.8rem;
-  font-style: italic;
-  color: var(--scripture-gold);
-  line-height: 1.2;
-  text-shadow: 0 0 15px rgba(255,215,0,0.2);
-  margin-bottom: 6px;
+
+/* NEBULA BACKGROUND animated layers */
+.space-nebula {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
 }
-.scripture-ref {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 0.85rem;
+
+.nebula-layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 20% 50%, rgba(120, 70, 200, 0.25) 0%, transparent 55%);
+  filter: blur(65px);
+  opacity: 0.7;
+  animation: driftNebula 28s infinite alternate ease-in-out;
+}
+
+.nebula-layer:nth-child(2) {
+  background: radial-gradient(ellipse at 85% 25%, rgba(60, 150, 220, 0.3) 0%, transparent 70%);
+  filter: blur(80px);
+  animation-duration: 35s;
+  animation-delay: -5s;
+  opacity: 0.6;
+}
+
+.nebula-layer:nth-child(3) {
+  background: radial-gradient(ellipse at 40% 80%, rgba(200, 100, 230, 0.2) 0%, transparent 60%);
+  filter: blur(100px);
+  animation-duration: 42s;
+  animation-delay: -12s;
+  opacity: 0.5;
+}
+
+@keyframes driftNebula {
+  0% { transform: scale(1) translate(0%, 0%); opacity: 0.5; }
+  100% { transform: scale(1.2) translate(4%, -3%); opacity: 0.8; }
+}
+
+/* stars twinkling + dust */
+.star-dust {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(1px 1px at 12% 88%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(2px 2px at 56% 23%, #ffe5b4 1px, transparent 1px),
+    radial-gradient(1px 1px at 78% 44%, #c2dcff 0.5px, transparent 0.5px),
+    radial-gradient(1.5px 1.5px at 33% 72%, #f0e6ff 0.7px, transparent 0.7px),
+    radial-gradient(2px 2px at 93% 15%, white 1px, transparent 1px),
+    radial-gradient(1px 1px at 48% 39%, #ffd8b5 0.5px, transparent 0.5px),
+    radial-gradient(1.5px 1.5px at 64% 91%, #ffffff 0.8px, transparent 0.8px),
+    radial-gradient(2px 2px at 5% 34%, #a4c2ff 1px, transparent 1px),
+    radial-gradient(1px 1px at 82% 67%, #ded2ff 0.5px, transparent 0.5px);
+  background-size: 200px 200px;
+  background-repeat: repeat;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* shooting star effect */
+.shooting-star {
+  position: fixed;
+  top: -10px;
+  left: -10px;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 12px 2px rgba(255,255,210,0.8);
+  animation: shootLinear 12s linear infinite;
+  opacity: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+@keyframes shootLinear {
+  0% { transform: translate(5vw, 5vh) rotate(25deg); opacity: 0; }
+  8% { opacity: 1; }
+  18% { transform: translate(85vw, 35vh) rotate(25deg); opacity: 0; }
+  100% { opacity: 0; }
+}
+.shooting-star:nth-child(2) { animation-duration: 18s; animation-delay: 6s; left: 20%; }
+.shooting-star:nth-child(3) { animation-duration: 25s; animation-delay: 2s; top: 15%; left: -5%; }
+
+/* Cosmic container */
+.cosmic-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.4rem 1.6rem 3rem;
+  position: relative;
+  z-index: 10;
+  backdrop-filter: blur(0px);
+}
+
+/* Header glow */
+.cosmic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border-glow);
+  padding-bottom: 1.2rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(90deg, rgba(10,20,40,0.4) 0%, rgba(0,0,0,0) 100%);
+  border-radius: 0 0 12px 0;
+}
+
+.logo-celestial h1 {
+  font-family: 'Space Mono', monospace;
+  font-weight: 400;
+  font-size: 1.85rem;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #F0E9FF, #B3C7FF, #E3BAFF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 15px rgba(90,130,255,0.3);
+}
+.logo-celestial p {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  letter-spacing: 0.4em;
-  color: var(--cyan);
-  font-weight: 700;
+  color: var(--text-mist);
+  margin-top: 5px;
 }
 
-/* TOPBAR */
-#topbar{flex-shrink:0;height:34px;background:var(--bg2);border-bottom:2px solid var(--border2);display:flex;align-items:stretch;overflow:hidden}
-.tb-brand{display:flex;align-items:center;gap:8px;padding:0 14px;border-right:1px solid var(--border2);text-decoration:none;flex-shrink:0}
-.tb-moon{font-size:1.05rem;filter:drop-shadow(0 0 8px var(--cyan))}
-.tb-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;color:#fff;letter-spacing:.06em}
-.tb-title span{color:var(--cyan)}
-.tb-chip{display:flex;align-items:center;gap:4px;padding:0 11px;border-right:1px solid var(--border);flex-shrink:0}
-.tb-lbl{font-size:.46rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
-.tb-val{font-size:.68rem;font-weight:700;font-variant-numeric:tabular-nums}
-.tb-live{display:flex;align-items:center;gap:5px;padding:0 10px;font-size:.52rem;letter-spacing:.14em;color:var(--green);font-weight:700}
-.pip{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(0,230,118,.7);animation:pip 1.6s ease infinite}
-@keyframes pip{0%{box-shadow:0 0 0 0 rgba(0,230,118,.7)}70%{box-shadow:0 0 0 8px rgba(0,230,118,0)}100%{box-shadow:0 0 0 0 rgba(0,230,118,0)}}
-.v-cyan{color:var(--cyan)} .v-green{color:var(--green)} .v-amber{color:var(--amber)} .v-white{color:#fff}
+.sky-weather-pulse {
+  background: rgba(10, 16, 30, 0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 48px;
+  padding: 0.3rem 1rem 0.3rem 1.2rem;
+  border: 1px solid rgba(122, 105, 180, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.7rem;
+  font-weight: 400;
+  font-family: 'Space Mono', monospace;
+}
+.weather-icon {
+  font-size: 1rem;
+  filter: drop-shadow(0 0 3px cyan);
+}
+.weather-text {
+  color: var(--nebula-cyan);
+}
 
-/* MAIN LAYOUT */
-#main{flex:1;min-height:0;display:grid;grid-template-columns:290px 1fr 260px;overflow:hidden}
+/* 2 Column main layout (more celestial flow) */
+.main-cosmic-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+}
+@media (max-width: 860px) {
+  .main-cosmic-grid { grid-template-columns: 1fr; }
+  .cosmic-container { padding: 1rem; }
+}
 
-/* LEFT/RIGHT PANELS */
-#left, #right { background:var(--panel); display:flex; flex-direction:column; border-right: 1px solid var(--border2); }
-#right { border-right:none; border-left: 1px solid var(--border2); }
-#center { background:var(--bg3); display:flex; flex-direction:column; overflow:hidden; }
+/* devotional core panel */
+.devotional-core {
+  background: var(--glass-panel);
+  backdrop-filter: blur(14px);
+  border-radius: 32px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+  padding: 2rem 2rem 2.2rem;
+  transition: all 0.25s;
+}
 
-/* DATA COMPONENTS */
-#heroKp{padding:15px; background:var(--bg2); border-bottom:1px solid var(--border2); display:flex; align-items:center; gap:15px;}
-#kpSvgWrap{position:relative; width:70px; height:70px;}
-.kp-center{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed'; font-size:2rem; font-weight:800;}
-#auroraMap{height:250px; width:100%; background:#000;}
-.sec-hdr{padding:6px 10px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:0.5rem; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase;}
+.celestial-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--nebula-cyan);
+  margin-bottom: 1.2rem;
+}
+.celestial-badge i {
+  font-size: 0.7rem;
+}
+.star-date {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--nebula-pink);
+  border-left: 2px solid currentColor;
+  padding-left: 12px;
+  margin-bottom: 1rem;
+}
+.devotional-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(125deg, #FFE6C7, #CDC6FF);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  line-height: 1.2;
+  margin-bottom: 1.2rem;
+}
+.scripture-glow {
+  background: rgba(80, 100, 180, 0.18);
+  border-left: 3px solid var(--nebula-blue);
+  padding: 0.9rem 1.2rem;
+  border-radius: 18px;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+  font-style: normal;
+  font-weight: 400;
+  color: #cfdcff;
+}
+.reflection-text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: #e0eaff;
+  margin-bottom: 1.8rem;
+}
+.prayer-mist {
+  background: rgba(90, 70, 150, 0.2);
+  border-radius: 24px;
+  padding: 1.2rem 1.4rem;
+  border: 1px solid rgba(199, 125, 255, 0.3);
+}
+.prayer-mist .label-pray {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--star-gold);
+  margin-bottom: 0.6rem;
+}
 
-/* SCROLL AREAS */
-.scroll-v { flex:1; overflow-y:auto; padding:10px; }
-.scroll-v::-webkit-scrollbar { width:4px; }
-.scroll-v::-webkit-scrollbar-thumb { background: var(--border2); }
+/* Right Sidebar: Weather + archive nebula style */
+.sidebar-cosmic {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
 
-#footer{height:22px; background:var(--bg2); border-top:1px solid var(--border2); display:flex; align-items:center; justify-content:space-between; padding:0 10px; font-size:10px; color:var(--dim);}
+.weather-live-panel, .archive-nebula {
+  background: var(--glass-panel);
+  backdrop-filter: blur(12px);
+  border-radius: 28px;
+  border: 1px solid rgba(110, 140, 230, 0.25);
+  padding: 1.2rem 1.2rem 1.2rem;
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--nebula-cyan);
+  margin-bottom: 1rem;
+  border-bottom: 1px dashed rgba(120,150,200,0.3);
+  padding-bottom: 0.6rem;
+}
+.weather-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.weather-temp {
+  font-size: 2.1rem;
+  font-weight: 600;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: -2px;
+}
+.weather-condition {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-mist);
+}
+.moon-phase-micro {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-size: 0.65rem;
+  border-top: 1px solid rgba(200,200,255,0.15);
+  padding-top: 10px;
+}
+.loc-text {
+  font-size: 0.6rem;
+  color: var(--star-silver);
+  font-family: monospace;
+}
+.archive-list-scroll {
+  max-height: 360px;
+  overflow-y: auto;
+  margin-top: 5px;
+}
+.archive-entry-celestial {
+  padding: 0.55rem 0.3rem;
+  border-bottom: 1px solid rgba(100, 140, 230, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+}
+.archive-entry-celestial:hover {
+  background: rgba(106, 90, 205, 0.2);
+  transform: translateX(4px);
+}
+.archive-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--nebula-pink);
+  border-radius: 10px;
+  box-shadow: 0 0 6px #c084fc;
+}
+.archive-date {
+  font-size: 0.65rem;
+  font-family: monospace;
+  font-weight: 500;
+  color: var(--star-silver);
+}
+.archive-search {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 1rem;
+}
+.archive-search input {
+  flex: 1;
+  background: rgba(20, 30, 55, 0.8);
+  border: 1px solid var(--border-glow);
+  border-radius: 40px;
+  padding: 8px 14px;
+  font-size: 0.7rem;
+  font-family: monospace;
+  color: white;
+  outline: none;
+}
+.archive-search button {
+  background: rgba(80, 100, 160, 0.5);
+  border: none;
+  border-radius: 40px;
+  padding: 0 14px;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.refresh-btn-cosmic {
+  background: transparent;
+  border: 1px solid rgba(150, 170, 255, 0.5);
+  font-size: 0.6rem;
+  padding: 5px 12px;
+  border-radius: 20px;
+  color: #b1c3ff;
+  cursor: pointer;
+  margin-top: 12px;
+  width: 100%;
+  transition: 0.2s;
+}
+.loader-glow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 20px;
+  justify-content: center;
+  color: #bfcaff;
+}
+.footer-cosmic {
+  margin-top: 3rem;
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  border-top: 1px solid rgba(100, 120, 200, 0.2);
+  padding-top: 1.5rem;
+}
+
+/* small tweaks */
+i, .fas, .far { color: inherit; }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: #030614; }
+::-webkit-scrollbar-thumb { background: #4d6bcf; border-radius: 10px; }
 </style>
 </head>
 <body>
+<div class="space-nebula">
+  <div class="nebula-layer"></div>
+  <div class="nebula-layer"></div>
+  <div class="nebula-layer"></div>
+</div>
+<div class="star-dust"></div>
+<div class="shooting-star"></div>
+<div class="shooting-star"></div>
+<div class="shooting-star"></div>
 
-<div id="topbar">
-  <a class="tb-brand" href="#">
-    <span class="tb-moon">🌙</span>
-    <span class="tb-title">Our<span>NightSky</span></span>
-  </a>
-  <div class="tb-chip"><span class="tb-lbl">Status</span><span class="tb-val v-white">OBSERVER ACTIVE</span></div>
-  <div class="tb-live"><span class="pip"></span>LIVE TELEMETRY</div>
-  <div style="margin-left:auto; display:flex; align-items:center; padding-right:10px;">
-    <button onclick="location.reload()" style="background:none; border:1px solid var(--border); color:var(--cyan); padding:2px 8px; font-family:inherit; cursor:pointer;">REFRESH</button>
+<div class="cosmic-container">
+  <div class="cosmic-header">
+    <div class="logo-celestial">
+      <h1>✦ NEBULA DEVOTIONS ✦</h1>
+      <p>where heavens speak & spirit breathes</p>
+    </div>
+    <div class="sky-weather-pulse" id="weatherWidget">
+      <i class="fas fa-cloud-moon weather-icon"></i>
+      <span class="weather-text" id="weatherSummary">locating sky...</span>
+    </div>
   </div>
-</div>
 
-<div id="scriptureHeader">
-  <div class="scripture-text">"The heavens declare the glory of God; and the firmament sheweth his handywork."</div>
-  <div class="scripture-ref">Psalm 19:1[cite: 1]</div>
-</div>
+  <div class="main-cosmic-grid">
+    <!-- MAIN DEVOTIONAL NEBULA CORE -->
+    <div class="devotional-core" id="devotionalCore">
+      <div class="celestial-badge"><i class="fas fa-star-of-life"></i> TODAY'S CELESTIAL MEDITATION</div>
+      <div class="star-date" id="starDateDisplay">—— • ——</div>
+      <div class="loader-glow" id="devotionalLoader"><i class="fas fa-circle-notch fa-spin"></i> drawing cosmic reflection...</div>
+      <div id="devotionalContent" style="display: none;"></div>
+    </div>
 
-<div id="main">
-  <!-- LEFT: SPACE WEATHER -->
-  <div id="left">
-    <div id="heroKp">
-        <div id="kpSvgWrap">
-            <svg viewBox="0 0 76 76" width="70" height="70" style="transform:rotate(-90deg)">
-                <circle cx="38" cy="38" r="34" fill="none" stroke="var(--border)" stroke-width="6"/>
-                <circle id="kpArc" cx="38" cy="38" r="34" fill="none" stroke="var(--cyan)" stroke-width="6" stroke-dasharray="0 214"/>
-            </svg>
-            <div class="kp-center" id="kpVal">--</div>
+    <!-- RIGHT SIDEBAR : NIGHT SKY WEATHER + ARCHIVE -->
+    <div class="sidebar-cosmic">
+      <!-- Live Local Sky Weather Card -->
+      <div class="weather-live-panel">
+        <div class="panel-head"><i class="fas fa-meteor"></i> NIGHT SKY CONDITIONS</div>
+        <div id="liveWeatherData">
+          <div class="loader-glow" style="padding: 0.5rem;"><i class="fas fa-spinner fa-pulse"></i> reading celestial winds...</div>
         </div>
-        <div>
-            <div style="font-size:0.6rem; color:var(--muted)">PLANETARY K-INDEX</div>
-            <div id="kpStatus" style="font-weight:700; color:var(--green)">QUIET</div>
+      </div>
+
+      <!-- Archive Nebula -->
+      <div class="archive-nebula">
+        <div class="panel-head"><i class="fas fa-scroll"></i> STAR ARCHIVE</div>
+        <div class="archive-search">
+          <input type="text" id="archiveSearchInput" placeholder="search by date (YYYY-MM-DD) ..." autocomplete="off">
+          <button id="searchArchiveBtn"><i class="fas fa-search"></i></button>
         </div>
-    </div>
-    <div class="sec-hdr">Solar Wind & Magnetic</div>
-    <div class="scroll-v" id="solarData">
-        <div id="windSpeed">Loading Solar Wind...</div>
-    </div>
-  </div>
-
-  <!-- CENTER: MAPS -->
-  <div id="center">
-    <div id="auroraMap"></div>
-    <div class="sec-hdr">18-Hour Forecast</div>
-    <div class="scroll-v" id="kpForecast"></div>
-  </div>
-
-  <!-- RIGHT: LOCAL WEATHER -->
-  <div id="right">
-    <div style="padding:15px; background:var(--bg2); border-bottom:1px solid var(--border2)">
-        <div id="localCity" style="font-family:'Barlow Condensed'; font-size:1.2rem; font-weight:700;">FETCHING LOCATION...</div>
-        <div id="localTemp" style="font-size:1.5rem; color:var(--amber)">--°F</div>
-    </div>
-    <div class="sec-hdr">Observing Conditions</div>
-    <div class="scroll-v" id="wxDetails">
-        <p>Connecting to weather satellites...</p>
+        <div class="archive-list-scroll" id="archiveListContainer">
+          <div class="loader-glow"><i class="fas fa-circle-notch fa-spin"></i> loading stellar archive...</div>
+        </div>
+        <button class="refresh-btn-cosmic" id="refreshArchiveBtn"><i class="fas fa-sync-alt"></i> &nbsp;REFRESH ARCHIVE</button>
+      </div>
     </div>
   </div>
-</div>
-
-<div id="footer">
-  <span>OURNIGHTSKY // DATA BY NOAA SWPC & OPENWEATHER</span>
-  <span id="timestamp"></span>
+  <div class="footer-cosmic">
+    <i class="fas fa-moon"></i> “Lift your eyes and see — who created these?” (Isaiah 40:26) • nebula devotionals
+  </div>
 </div>
 
 <script>
-// --- FULL LOGIC RESTORATION ---
+  // ========== CELESTIAL CONFIG ==========
+  const GITHUB_RAW = 'https://raw.githubusercontent.com/NAGOHUSA/OurNightSky_Devotionals/main/devotionals/';
+  const GITHUB_API = 'https://api.github.com/repos/NAGOHUSA/OurNightSky_Devotionals/contents/devotionals';
+  let archiveCache = [];
 
-const CONFIG = {
-    KP_URL: 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json',
-    AURORA_URL: 'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json',
-    KP_FORECAST: 'https://services.swpc.noaa.gov/text/3-day-forecast.txt'
-};
+  // helpers
+  function formatStarDate() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = d.toLocaleString('default', { month: 'long' }).toUpperCase();
+    const day = d.getDate();
+    return `${month} ${day}, ${year}  ✦  celestial hour`;
+  }
 
-let map;
+  // approximate moon phase + pretty output 
+  function getMoonPhaseIcon(phaseIndex) {
+    const phases = ['🌑 New', '🌒 Waxing Crescent', '🌓 First Quarter', '🌔 Waxing Gibbous', '🌕 Full', '🌖 Waning Gibbous', '🌗 Last Quarter', '🌘 Waning Crescent'];
+    return phases[phaseIndex % 8];
+  }
+  function computeMoonPhasePretty() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    const lp = 2551443; // moon cycle seconds
+    const newMoon = new Date(2000, 0, 6, 18, 14).getTime();
+    const phase = ((date.getTime() - newMoon) / 1000 % lp) / lp;
+    const idx = Math.floor(phase * 8);
+    return getMoonPhaseIcon(idx);
+  }
 
-async function init() {
-    initMap();
-    fetchKp();
-    fetchLocationAndWeather();
-    setInterval(fetchKp, 60000);
-    document.getElementById('timestamp').textContent = new Date().toUTCString();
-}
-
-function initMap() {
-    map = L.map('auroraMap', {zoomControl: false, attributionControl: false}).setView([60, 0], 2);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-}
-
-async function fetchKp() {
+  // 🌙 weather & location (Browser geolocation + Open-Meteo)
+  let userLat = null, userLon = null;
+  async function fetchLocalWeather() {
+    const weatherDiv = document.getElementById('liveWeatherData');
+    if (!weatherDiv) return;
+    weatherDiv.innerHTML = `<div class="loader-glow" style="padding:0.2rem;"><i class="fas fa-globe fa-spin"></i> detecting sky portal...</div>`;
     try {
-        const res = await fetch(CONFIG.KP_URL);
-        const data = await res.json();
-        const latest = data[data.length - 1];
-        const kp = parseFloat(latest[1]);
-        
-        // Update UI
-        const arc = document.getElementById('kpArc');
-        const val = document.getElementById('kpVal');
-        val.textContent = kp;
-        
-        // Circumference is ~214
-        const offset = (kp / 9) * 214;
-        arc.style.strokeDasharray = `${offset} 214`;
-        
-        if(kp >= 5) {
-            val.style.color = 'var(--red)';
-            document.getElementById('kpStatus').textContent = 'STORM';
-            document.getElementById('kpStatus').style.color = 'var(--red)';
-        } else if (kp >= 4) {
-            val.style.color = 'var(--amber)';
-            document.getElementById('kpStatus').textContent = 'UNSETTLED';
-        }
-    } catch(e) { console.error("Kp Load Fail", e); }
-}
+      const position = await new Promise((resolve, reject) => {
+        if (!navigator.geolocation) reject(new Error("Geolocation not supported"));
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
+      });
+      userLat = position.coords.latitude;
+      userLon = position.coords.longitude;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${userLat}&longitude=${userLon}&current_weather=true&timezone=auto&forecast_days=1`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.current_weather) {
+        const w = data.current_weather;
+        const tempC = w.temperature;
+        const wind = w.windspeed;
+        const weatherCode = w.weathercode;
+        let condition = "clear skies";
+        if (weatherCode >= 61 && weatherCode <= 65) condition = "rain veils";
+        else if (weatherCode >= 71 && weatherCode <= 77) condition = "snow nebula";
+        else if (weatherCode >= 80 && weatherCode <= 82) condition = "shower comets";
+        else if (weatherCode >= 95) condition = "storm aurora";
+        else condition = "stellar clarity";
+        const moonPhaseStr = computeMoonPhasePretty();
+        weatherDiv.innerHTML = `
+          <div class="weather-detail">
+            <div class="weather-temp">${Math.round(tempC)}°C</div>
+            <div class="weather-condition"><i class="fas fa-wind"></i> ${condition} · wind ${Math.round(wind)} km/h</div>
+            <div class="moon-phase-micro"><span><i class="fas fa-moon"></i> ${moonPhaseStr}</span><span class="loc-text"><i class="fas fa-map-marker-alt"></i> ${userLat.toFixed(2)}°, ${userLon.toFixed(2)}°</span></div>
+            <div style="font-size:0.6rem; margin-top: 6px;"><i class="fas fa-cloud-moon"></i> local night sky · live</div>
+          </div>`;
+        // update global weather widget too
+        document.getElementById('weatherSummary').innerHTML = `${condition} ${Math.round(tempC)}°C`;
+        document.querySelector('.weather-icon').className = weatherCode>=80 ? "fas fa-cloud-rain weather-icon" : "fas fa-cloud-moon weather-icon";
+      } else throw new Error();
+    } catch (err) {
+      weatherDiv.innerHTML = `<div style="font-size:0.7rem; text-align:center;">✨ unable to determine local sky ✨<br><span style="font-size:0.55rem;">using celestial mode</span></div>`;
+      document.getElementById('weatherSummary').innerHTML = "nebula veiled";
+    }
+  }
 
-async function fetchLocationAndWeather() {
-    // Falls back to a default if geo fails
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-        const {latitude, longitude} = pos.coords;
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=cloudcover`);
-        const data = await res.json();
-        
-        document.getElementById('localCity').textContent = "LOCAL OBSERVER";
-        document.getElementById('localTemp').textContent = `${Math.round(data.current_weather.temperature * 9/5 + 32)}°F`;
-        document.getElementById('wxDetails').innerHTML = `
-            <div style="margin-bottom:10px">Cloud Cover: ${data.hourly.cloudcover[0]}%</div>
-            <div>Wind Speed: ${data.current_weather.windspeed} km/h</div>
-        `;
-    }, () => {
-        document.getElementById('localCity').textContent = "LOCATION ACCESS DENIED";
+  // render devotional content from JSON
+  function renderDevotional(data, dateStr) {
+    const container = document.getElementById('devotionalContent');
+    const loader = document.getElementById('devotionalLoader');
+    if (!container) return;
+    if (!data) {
+      container.innerHTML = `<div class="reflection-text" style="padding:1rem; text-align:center;"><i class="fas fa-comet"></i> Today’s whisper from the stars is in silent prayer.<br>Explore archive to find past reflections.</div>`;
+      loader.style.display = 'none';
+      container.style.display = 'block';
+      return;
+    }
+    let title = data.title || 'Cosmic Meditation';
+    let scripture = data.scripture || 'The heavens declare the glory of God (Psalm 19)';
+    let reflection = data.reflection || 'Look up — the vastness speaks of His majesty, each star a reminder of faithfulness.';
+    let prayer = data.prayer || 'Lord of light and nebulae, guide our hearts beneath your infinite sky. Amen.';
+    // fallback markdown parse if needed
+    if (data.content_markdown) {
+      const md = data.content_markdown;
+      if (!title && md) title = md.split('\n')[0].replace(/^#+\s*/, '').trim() || title;
+      const scMatch = md.match(/## Scripture\n([\s\S]*?)(?=\n## |$)/i);
+      if (scMatch && scMatch[1]) scripture = scMatch[1].trim();
+      const refMatch = md.match(/## Reflection\n([\s\S]*?)(?=\n## |$)/i);
+      if (refMatch && refMatch[1]) reflection = refMatch[1].trim();
+      const prMatch = md.match(/## Prayer\n([\s\S]*?)$/i);
+      if (prMatch && prMatch[1]) prayer = prMatch[1].trim();
+    }
+    const displayDateNice = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    container.innerHTML = `
+      <div class="devotional-title">${escapeHtml(title)}</div>
+      <div class="scripture-glow"><i class="fas fa-quote-left" style="opacity:0.6; margin-right:6px;"></i> ${escapeHtml(scripture)}</div>
+      <div class="reflection-text">${escapeHtml(reflection).replace(/\n/g, '<br>')}</div>
+      <div class="prayer-mist"><div class="label-pray"><i class="fas fa-feather-alt"></i> silent prayer</div><div style="font-style:italic;">${escapeHtml(prayer).replace(/\n/g, '<br>')}</div></div>
+    `;
+    loader.style.display = 'none';
+    container.style.display = 'block';
+  }
+  function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
+
+  async function loadTodayDevotional() {
+    const today = new Date().toISOString().slice(0,10);
+    try {
+      const res = await fetch(GITHUB_RAW + today + '.json');
+      if (res.ok) renderDevotional(await res.json(), today);
+      else renderDevotional(null, today);
+    } catch(e) { renderDevotional(null, today); }
+  }
+
+  // Archive functions
+  async function loadArchiveIndex() {
+    try {
+      const response = await fetch(GITHUB_API);
+      if (!response.ok) throw new Error();
+      const files = await response.json();
+      archiveCache = files.filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f.name))
+        .map(f => ({ date: f.name.replace('.json', ''), url: f.download_url || (GITHUB_RAW + f.name) }))
+        .sort((a,b) => b.date.localeCompare(a.date));
+      renderArchiveList('');
+    } catch(e) {
+      document.getElementById('archiveListContainer').innerHTML = `<div class="loader-glow" style="color:#a77aff;">⚠️ archive stardust unreachable</div>`;
+    }
+  }
+
+  function renderArchiveList(filter) {
+    const container = document.getElementById('archiveListContainer');
+    const q = filter.trim().toLowerCase();
+    let items = q ? archiveCache.filter(f => f.date.includes(q)) : archiveCache;
+    if (!items.length) { container.innerHTML = '<div style="padding: 1rem; text-align:center; font-size:0.7rem;">no celestial entry found</div>'; return; }
+    container.innerHTML = items.slice(0, 55).map(entry => `
+      <div class="archive-entry-celestial" data-url="${escapeHtml(entry.url)}" data-date="${entry.date}">
+        <div class="archive-dot"></div>
+        <div class="archive-date">✦ ${entry.date}</div>
+      </div>
+    `).join('');
+    document.querySelectorAll('.archive-entry-celestial').forEach(el => {
+      el.addEventListener('click', async (e) => {
+        const url = el.getAttribute('data-url');
+        const date = el.getAttribute('data-date');
+        const loaderDiv = document.getElementById('devotionalLoader');
+        const contentDiv = document.getElementById('devotionalContent');
+        loaderDiv.style.display = 'flex';
+        contentDiv.style.display = 'none';
+        loaderDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> opening cosmic scroll...';
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error();
+          renderDevotional(await resp.json(), date);
+        } catch(err) { renderDevotional(null, date); }
+        document.getElementById('starDateDisplay').innerHTML = `${date}  ✦  archived reflection`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
     });
-}
+  }
 
-window.onload = init;
+  function handleArchiveSearch() {
+    const val = document.getElementById('archiveSearchInput').value;
+    renderArchiveList(val);
+  }
+  function refreshEverything() {
+    loadArchiveIndex().then(()=>renderArchiveList(''));
+    loadTodayDevotional();
+    fetchLocalWeather();
+    document.getElementById('starDateDisplay').innerHTML = formatStarDate();
+  }
+
+  document.getElementById('searchArchiveBtn').addEventListener('click', handleArchiveSearch);
+  document.getElementById('refreshArchiveBtn').addEventListener('click', ()=>{
+    loadArchiveIndex().then(()=>renderArchiveList(''));
+  });
+  document.getElementById('archiveSearchInput').addEventListener('keydown', e => { if(e.key === 'Enter') handleArchiveSearch(); });
+
+  // init cosmic
+  (function initCosmic() {
+    document.getElementById('starDateDisplay').innerHTML = formatStarDate();
+    fetchLocalWeather();
+    loadTodayDevotional();
+    loadArchiveIndex().then(() => renderArchiveList(''));
+    setInterval(() => {
+      if (document.visibilityState === 'visible') fetchLocalWeather();
+    }, 10 * 60 * 1000);
+  })();
 </script>
-
 </body>
 </html>
