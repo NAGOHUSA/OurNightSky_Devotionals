@@ -4,26 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Our Night Sky · Celestial Devotionals</title>
-<meta name="description" content="Daily devotionals inspired by the heavens. Scripture, reflection & prayer under the stars — OurNightSky.Us">
-<meta name="theme-color" content="#070910">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
 :root {
   --bg: #070910;
   --bg2: #0d1117;
-  --bg3: #111927;
   --panel: rgba(13,18,28,0.85);
   --border: rgba(140,170,220,0.12);
-  --border-hi: rgba(140,170,220,0.28);
   --accent: #4a7fff;
   --accent2: #7eb8ff;
   --gold: #e8c97a;
   --gold2: #f5dfa0;
   --text: #d4ddf0;
-  --text2: #8a9ab8;
   --text3: #5a6a88;
-  --pip: #4a7fff;
   --mono: 'JetBrains Mono', monospace;
   --cond: 'Barlow Condensed', sans-serif;
 }
@@ -34,20 +28,9 @@ body { min-height: 100vh; }
 /* STAR FIELD */
 .stars {
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background:
-    radial-gradient(1.5px 1.5px at 12% 8%, rgba(200,220,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 34% 22%, rgba(200,220,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 57% 14%, rgba(255,240,200,0.6) 0%, transparent 100%),
-    radial-gradient(2px 2px at 78% 6%, rgba(200,220,255,0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 91% 31%, rgba(200,220,255,0.5) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 4% 45%, rgba(255,240,200,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 23% 60%, rgba(200,220,255,0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 67% 55%, rgba(200,220,255,0.5) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 85% 72%, rgba(255,240,200,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 44% 80%, rgba(200,220,255,0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 15% 88%, rgba(200,220,255,0.3) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 62% 93%, rgba(200,220,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 90% 91%, rgba(255,240,200,0.4) 0%, transparent 100%);
+  background: radial-gradient(1.5px 1.5px at 12% 8%, rgba(200,220,255,0.7) 0%, transparent 100%),
+              radial-gradient(1px 1px at 34% 22%, rgba(200,220,255,0.5) 0%, transparent 100%),
+              radial-gradient(2px 2px at 78% 6%, rgba(200,220,255,0.4) 0%, transparent 100%);
 }
 
 .wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem 1.5rem 4rem; position: relative; z-index: 2; }
@@ -57,133 +40,56 @@ body { min-height: 100vh; }
   display: flex; align-items: center; justify-content: space-between;
   border-bottom: 1px solid var(--border);
   padding-bottom: 1rem; margin-bottom: 2rem;
-  flex-wrap: wrap; gap: 1rem;
 }
-.logo-block { display: flex; align-items: baseline; gap: 1rem; }
-.logo-wordmark {
-  font-family: var(--cond); font-size: 1.6rem; font-weight: 700;
-  letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold2);
-}
-.logo-tag {
-  font-family: var(--mono); font-size: 0.65rem; font-weight: 400;
-  color: var(--text3); letter-spacing: 0.15em; text-transform: uppercase;
-}
+.logo-wordmark { font-family: var(--cond); font-size: 1.6rem; font-weight: 700; text-transform: uppercase; color: var(--gold2); }
+.logo-tag { font-family: var(--mono); font-size: 0.65rem; color: var(--text3); text-transform: uppercase; }
 
 /* ── THREE COLUMNS ── */
-.three-col {
-  display: grid;
-  grid-template-columns: 220px 1fr 210px;
-  gap: 1.5rem;
-  align-items: start;
-}
-@media (max-width: 860px) {
-  .three-col { grid-template-columns: 1fr; }
-}
+.three-col { display: grid; grid-template-columns: 220px 1fr 210px; gap: 1.5rem; align-items: start; }
+@media (max-width: 860px) { .three-col { grid-template-columns: 1fr; } }
 
-/* ── PANEL ── */
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  backdrop-filter: blur(8px);
-  margin-bottom: 1.2rem;
-}
-.panel-header {
-  display: flex; align-items: center; gap: 8px;
-  padding: 0.6rem 1rem;
-  border-bottom: 1px solid var(--border);
-  font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
-  letter-spacing: 0.2em; text-transform: uppercase; color: var(--text3);
-}
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; backdrop-filter: blur(8px); margin-bottom: 1.2rem; }
+.panel-header { display: flex; align-items: center; gap: 8px; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; color: var(--text3); }
 
-/* ── NASA APOD AREA ── */
-#nasaContent { min-height: 200px; display: flex; flex-direction: column; }
-#nasaContent img, #nasaContent iframe {
-  width: 100%; height: auto; display: block;
-  border-bottom: 1px solid var(--border);
-}
-.nasa-info { padding: 0.8rem 1rem; font-size: 0.7rem; }
-.nasa-title { color: var(--gold); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
-.nasa-credit { color: var(--text3); font-size: 0.58rem; letter-spacing: 0.05em; }
+/* ── IMAGE AREA ── */
+#spaceContent { min-height: 200px; }
+#spaceContent img { width: 100%; height: auto; display: block; border-bottom: 1px solid var(--border); }
+.space-info { padding: 0.8rem 1rem; font-size: 0.7rem; }
+.space-title { color: var(--gold); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+.space-desc { color: var(--text3); font-size: 0.58rem; line-height: 1.4; }
 
-/* ── DEVOTIONAL STYLES ── */
-.date-big { font-family: var(--cond); font-size: 3.2rem; font-weight: 700; line-height: 1; color: var(--gold2); }
-.date-month-year { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text3); margin-top: 4px; }
-.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 0.35rem 0; border-bottom: 1px solid var(--border); font-size: 0.7rem; }
-.stat-key { color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.58rem; }
-.stat-val { color: var(--gold); font-weight: 500; }
+/* ── DEVOTIONAL ── */
+.date-big { font-family: var(--cond); font-size: 3.2rem; font-weight: 700; color: var(--gold2); }
+.date-month-year { font-size: 0.65rem; text-transform: uppercase; color: var(--text3); }
+.devot-title { font-family: var(--cond); font-size: 2.1rem; font-weight: 700; color: var(--gold2); text-transform: uppercase; margin-bottom: 1.2rem; }
+.scripture-block { border-left: 3px solid var(--accent); padding: 0.8rem 1rem; background: rgba(74,127,255,0.06); font-size: 0.82rem; font-style: italic; margin-bottom: 1.2rem; }
+.section-head { font-size: 0.58rem; text-transform: uppercase; color: var(--text3); font-weight: 700; margin-bottom: 0.5rem; }
+.body-text { font-size: 0.82rem; line-height: 1.75; margin-bottom: 1.2rem; }
+.prayer-block { background: rgba(126,184,255,0.05); border: 1px solid rgba(126,184,255,0.15); padding: 1rem; border-radius: 4px; }
 
-.devot-eyebrow {
-  font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.22em;
-  color: var(--accent2); font-weight: 600; margin-bottom: 1rem;
-  display: flex; align-items: center; gap: 8px;
-}
-.devot-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-.devot-title {
-  font-family: var(--cond); font-size: 2.1rem; font-weight: 700;
-  line-height: 1.1; color: var(--gold2); letter-spacing: 0.01em;
-  text-transform: uppercase; margin-bottom: 1.2rem;
-}
-.scripture-block {
-  border-left: 3px solid var(--accent); padding: 0.8rem 1rem;
-  background: rgba(74,127,255,0.06); border-radius: 0 4px 4px 0;
-  font-size: 0.82rem; color: var(--text); line-height: 1.7; margin-bottom: 1.2rem; font-style: italic;
-}
-.section-head {
-  font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--text3); font-weight: 700; margin-bottom: 0.5rem;
-  display: flex; align-items: center; gap: 6px;
-}
-.section-head::before { content: '//'; color: var(--accent); }
-.body-text { font-size: 0.82rem; line-height: 1.75; color: var(--text); margin-bottom: 1.2rem; }
-.prayer-block {
-  background: rgba(126,184,255,0.05); border: 1px solid rgba(126,184,255,0.15);
-  border-radius: 4px; padding: 1rem;
-}
+/* ── ARCHIVE ── */
+.archive-entry { padding: 0.45rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 0.65rem; transition: 0.2s; }
+.archive-entry:hover { color: var(--accent2); background: rgba(255,255,255,0.05); }
 
-/* ── UI ELEMENTS ── */
 .loader-state { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text3); padding: 2rem 1.5rem; }
 .spinner { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.error-state { padding: 1.5rem; font-size: 0.72rem; color: var(--text3); text-align: center; }
-
-.archive-search { display: flex; border-bottom: 1px solid var(--border); }
-.archive-search input {
-  flex: 1; background: transparent; border: none; outline: none;
-  color: var(--text); font-family: var(--mono); font-size: 0.65rem; padding: 0.5rem 0.8rem;
-}
-.archive-list-inner { max-height: 340px; overflow-y: auto; padding: 0.4rem 0; }
-.archive-entry { padding: 0.45rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 0.65rem; transition: 0.2s; }
-.archive-entry:hover { background: rgba(74,127,255,0.1); color: var(--accent2); }
-
-.support-link {
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  color: var(--gold); font-size: 0.62rem; text-transform: uppercase; text-decoration: none;
-  padding: 0.5rem; border: 1px solid rgba(232,201,122,0.2); border-radius: 2px;
-}
-.site-footer {
-  margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
-}
 </style>
 </head>
 <body>
 <div class="stars"></div>
 <div class="wrap">
 
-  <!-- HEADER -->
   <div class="site-header">
     <div class="logo-block">
       <div class="logo-wordmark">OurNightSky</div>
       <div class="logo-tag">Celestial Devotionals</div>
     </div>
-    <div class="header-right">
-      <div class="section-label">ournightsky.us</div>
-    </div>
+    <div class="logo-tag">ournightsky.us</div>
   </div>
 
   <div class="three-col">
-    <!-- LEFT SIDEBAR -->
+    <!-- LEFT -->
     <div class="sidebar-left">
       <div class="panel">
         <div class="panel-header">TODAY</div>
@@ -194,108 +100,90 @@ body { min-height: 100vh; }
       </div>
       <div class="panel">
         <div class="panel-header">CELESTIAL INDEX</div>
-        <div style="padding: 0.5rem 1rem;">
-          <div class="stat-row"><span class="stat-key">Moon Phase</span><span class="stat-val" id="moonPhase">--</span></div>
-          <div class="stat-row"><span class="stat-key">Feed</span><span class="stat-val">LIVE</span></div>
-          <div class="stat-row"><span class="stat-key">Archive</span><span class="stat-val" id="archiveCount">...</span></div>
+        <div style="padding: 0.5rem 1rem; font-size: 0.7rem;">
+          <div style="display:flex; justify-content:space-between; padding: 4px 0; border-bottom: 1px solid var(--border);">
+            <span style="color:var(--text3)">Moon</span><span id="moonPhase" style="color:var(--gold)">--</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding: 4px 0;">
+            <span style="color:var(--text3)">Archive</span><span id="archiveCount" style="color:var(--gold)">--</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- MAIN COLUMN -->
+    <!-- MAIN -->
     <div class="main-col">
-      <!-- NASA PANEL -->
       <div class="panel" style="overflow: hidden;">
-        <div class="panel-header">NASA Astronomy Picture of the Day</div>
-        <div id="nasaContent">
-          <div class="loader-state"><i class="fas fa-circle-notch spinner"></i>&nbsp;Awaiting Signal from NASA...</div>
+        <div class="panel-header">Celestial Gallery</div>
+        <div id="spaceContent">
+          <div class="loader-state"><i class="fas fa-circle-notch spinner"></i>&nbsp;Searching the stars...</div>
         </div>
       </div>
 
-      <!-- DEVOTIONAL PANEL -->
       <div class="panel" style="padding: 1.5rem;" id="devotionalPanel">
-        <div class="loader-state"><i class="fas fa-circle-notch spinner"></i>&nbsp;Loading today's meditation...</div>
+        <div class="loader-state"><i class="fas fa-circle-notch spinner"></i>&nbsp;Loading meditation...</div>
       </div>
     </div>
 
-    <!-- RIGHT SIDEBAR -->
+    <!-- RIGHT -->
     <div class="sidebar-right">
-      <div class="panel" style="overflow: hidden;">
-        <div class="panel-header">ARCHIVE</div>
-        <div class="archive-search">
-          <input type="text" id="archiveSearch" placeholder="search date...">
-        </div>
-        <div class="archive-list-inner" id="archiveList"></div>
-      </div>
       <div class="panel">
-        <div style="padding: 0.8rem 1rem;">
-          <a href="https://buymeacoffee.com/ournightsky" class="support-link" target="_blank">
-            <i class="fas fa-mug-hot"></i>&nbsp;Buy Me a Coffee
-          </a>
-        </div>
+        <div class="panel-header">ARCHIVE</div>
+        <div id="archiveList" class="archive-list-inner"></div>
       </div>
     </div>
-  </div>
-
-  <div class="site-footer">
-    <div style="font-size:0.6rem; color:var(--text3); font-style:italic;">"The heavens declare the glory of God" — Psalm 19:1</div>
-    <div style="font-family:var(--cond); font-size:0.75rem; color:var(--text3);">OurNightSky.Us</div>
   </div>
 </div>
 
 <script>
   const GITHUB_RAW = 'https://raw.githubusercontent.com/NAGOHUSA/OurNightSky_Devotionals/main/devotionals/';
   const GITHUB_API = 'https://api.github.com/repos/NAGOHUSA/OurNightSky_Devotionals/contents/devotionals';
-  let archiveCache = [];
 
-  // --- UTILS ---
-  function esc(s) { return s ? s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''; }
-
-  // --- NASA APOD ---
-  async function loadNasaImage() {
-    const target = document.getElementById('nasaContent');
-    // NOTE: Using DEMO_KEY. If images break, sign up for a free key at api.nasa.gov
-    const apiKey = 'DEMO_KEY'; 
+  // --- NASA IMAGE LIBRARY SOURCE ---
+  async function loadSpaceImagery() {
+    const target = document.getElementById('spaceContent');
+    const queries = ['Nebula', 'Hubble Galaxy', 'Deep Space', 'Star Cluster'];
+    // Use the day of the month to pick a search term and an image index
+    const day = new Date().getDate();
+    const query = queries[day % queries.length];
+    
     try {
-      const resp = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${apiKey}`);
-      if(!resp.ok) throw new Error('API Limit');
+      const resp = await fetch(`https://images-api.nasa.gov/search?q=${query}&media_type=image`);
       const data = await resp.json();
+      const items = data.collection.items;
       
-      let mediaHtml = '';
-      if (data.media_type === 'video') {
-        mediaHtml = `<iframe src="${data.url}" frameborder="0" allowfullscreen style="aspect-ratio:16/9; width:100%;"></iframe>`;
-      } else {
-        mediaHtml = `<img src="${data.url}" alt="${data.title}" onerror="this.src='https://via.placeholder.com/800x450/070910/5a6a88?text=Image+Unavailable+Today'">`;
-      }
+      // Use day to pick a semi-random image from the results
+      const pick = items[day % Math.min(items.length, 20)];
+      const imgUrl = pick.links[0].href;
+      const title = pick.data[0].title;
+      const description = pick.data[0].description ? pick.data[0].description.substring(0, 150) + '...' : 'NASA imagery library.';
 
       target.innerHTML = `
-        ${mediaHtml}
-        <div class="nasa-info">
-          <div class="nasa-title">${esc(data.title)}</div>
-          <div class="nasa-credit">© ${esc(data.copyright) || 'Public Domain'} · NASA APOD</div>
+        <img src="${imgUrl}" alt="${title}">
+        <div class="space-info">
+          <div class="space-title">${title}</div>
+          <div class="space-desc">${description}</div>
         </div>`;
     } catch (e) {
-      target.innerHTML = `<div class="error-state">NASA feed temporarily offline (API limit reached). Check back shortly.</div>`;
+      target.innerHTML = `<div class="error-state" style="padding:2rem; text-align:center; color:var(--text3);">Gallery offline.</div>`;
     }
   }
 
-  // --- DEVOTIONAL RENDERING ---
+  // --- RESTORED ORIGINAL DEVOTIONAL LOGIC ---
   function renderDevotional(data, dateStr) {
     const panel = document.getElementById('devotionalPanel');
     if (!data) {
-      panel.innerHTML = `<div class="error-state"><i class="fas fa-moon"></i><br><br>Meditation for ${dateStr} is being prepared.</div>`;
+      panel.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text3);">No devotional for this date.</div>`;
       return;
     }
-
-    // Original robust parsing logic
-    let title = data.title || '';
-    let scripture = data.scripture || '';
-    let reflection = data.reflection || '';
-    let prayer = data.prayer || '';
+    
+    let title = data.title || "Celestial Reflection";
+    let scripture = data.scripture || "";
+    let reflection = data.reflection || "";
+    let prayer = data.prayer || "";
 
     if (data.content_markdown) {
       const md = data.content_markdown;
-      if (!title) title = (md.split('\n')[0] || '').replace(/^#+\s*/, '').trim();
       const mS = md.match(/## Scripture\n([\s\S]*?)(?=\n## |$)/i);
       if (mS) scripture = mS[1].trim();
       const mR = md.match(/## Reflection\n([\s\S]*?)(?=\n## |$)/i);
@@ -304,14 +192,12 @@ body { min-height: 100vh; }
       if (mP) prayer = mP[1].trim();
     }
 
-    const displayDate = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
-
     panel.innerHTML = `
-      <div class="devot-eyebrow">${displayDate}</div>
-      <div class="devot-title">${esc(title || 'Celestial Reflection')}</div>
-      ${scripture ? `<div class="scripture-block"><em>${esc(scripture)}</em><div style="font-size:0.55rem; color:var(--accent2); margin-top:8px; letter-spacing:0.1em;">— SCRIPTURE</div></div>` : ''}
-      ${reflection ? `<div class="section-head">REFLECTION</div><div class="body-text">${esc(reflection).replace(/\n/g, '<br>')}</div>` : ''}
-      ${prayer ? `<div class="prayer-block"><div class="section-head">PRAYER</div><div class="body-text" style="margin:0;">${esc(prayer).replace(/\n/g, '<br>')}</div></div>` : ''}
+      <div class="devot-title">${title}</div>
+      ${scripture ? `<div class="scripture-block">${scripture}</div>` : ''}
+      <div class="section-head">REFLECTION</div>
+      <div class="body-text">${reflection.replace(/\n/g, '<br>')}</div>
+      <div class="prayer-block"><div class="section-head">PRAYER</div><div class="body-text" style="margin:0;">${prayer.replace(/\n/g, '<br>')}</div></div>
     `;
   }
 
@@ -319,7 +205,6 @@ body { min-height: 100vh; }
     const today = new Date().toISOString().slice(0, 10);
     try {
       const r = await fetch(GITHUB_RAW + today + '.json');
-      if (!r.ok) throw new Error();
       renderDevotional(await r.json(), today);
     } catch { renderDevotional(null, today); }
   }
@@ -328,47 +213,26 @@ body { min-height: 100vh; }
     try {
       const r = await fetch(GITHUB_API);
       const files = await r.json();
-      archiveCache = files.filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f.name)).sort((a,b)=>b.name.localeCompare(a.name));
-      document.getElementById('archiveCount').textContent = archiveCache.length;
-      renderArchiveList('');
-    } catch (e) {
-      document.getElementById('archiveList').innerHTML = '<div class="error-state">Archive unavailable.</div>';
-    }
+      const archive = files.filter(f => f.name.endsWith('.json')).reverse();
+      document.getElementById('archiveCount').textContent = archive.length;
+      document.getElementById('archiveList').innerHTML = archive.slice(0,10).map(f => `<div class="archive-entry" onclick="loadArchiveItem('${f.download_url}', '${f.name}')">${f.name.replace('.json','')}</div>`).join('');
+    } catch (e) {}
   }
 
-  function renderArchiveList(q) {
-    const el = document.getElementById('archiveList');
-    const items = archiveCache.filter(f => f.name.includes(q));
-    el.innerHTML = items.map(f => `<div class="archive-entry" data-url="${f.download_url}" data-date="${f.name.replace('.json','')}">${f.name.replace('.json','')}</div>`).join('');
-    el.querySelectorAll('.archive-entry').forEach(en => {
-      en.addEventListener('click', async () => {
-        const date = en.getAttribute('data-date');
-        document.getElementById('devotionalPanel').innerHTML = `<div class="loader-state"><i class="fas fa-circle-notch spinner"></i>&nbsp;Loading ${date}...</div>`;
-        try {
-          const r = await fetch(en.getAttribute('data-url'));
-          renderDevotional(await r.json(), date);
-          window.scrollTo({top: 0, behavior: 'smooth'});
-        } catch { renderDevotional(null, date); }
-      });
-    });
-  }
+  window.loadArchiveItem = async (url, name) => {
+    const r = await fetch(url);
+    renderDevotional(await r.json(), name);
+    window.scrollTo({top: 0});
+  };
 
   function init() {
     const d = new Date();
     document.getElementById('dayNum').textContent = String(d.getDate()).padStart(2, '0');
     document.getElementById('monthYear').textContent = d.toLocaleDateString('en-US', { month: 'long' }).toUpperCase() + ' ' + d.getFullYear();
-    
-    // Moon Phase
-    const phases = ['NEW MOON','WAXING CRS','FIRST QTR','WAXING GIB','FULL MOON','WANING GIB','LAST QTR','WANING CRS'];
-    const cycle = ((d - new Date('2000-01-06')) / (1000 * 60 * 60 * 24)) % 29.53;
-    document.getElementById('moonPhase').textContent = phases[Math.floor(cycle / 29.53 * 8)] || 'CRESCENT';
-
-    loadNasaImage();
+    loadSpaceImagery();
     loadToday();
     loadArchive();
-    document.getElementById('archiveSearch').addEventListener('input', (e) => renderArchiveList(e.target.value));
   }
-  
   init();
 </script>
 </body>
