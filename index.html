@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>NEBULA DEVOTIONS · Cosmos & Creator</title>
-<meta name="description" content="Daily devotionals veiled in cosmic wonder — live sky weather, nebula breath, and scripture from the stars.">
+<title>Our Night Sky Devotions · Nebula Reflections</title>
+<meta name="description" content="Daily devotionals veiled in cosmic wonder — live sky weather, random nebula imagery, and scripture from the stars.">
 <meta name="theme-color" content="#02040c">
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -28,10 +28,8 @@
   --text-mist: #9aaac9;
   --text-dim: #5a6c8c;
   --border-glow: rgba(120, 150, 255, 0.2);
-  --glass-panel: rgba(5, 10, 25, 0.65);
-  --glass-border: rgba(100, 140, 255, 0.25);
-  --aurora-1: #4a2c8c;
-  --aurora-2: #2c5f8a;
+  --glass-panel: rgba(5, 10, 25, 0.68);
+  --glass-border: rgba(100, 140, 255, 0.3);
 }
 
 body {
@@ -43,7 +41,7 @@ body {
   overflow-x: hidden;
 }
 
-/* NEBULA BACKGROUND animated layers */
+/* NEBULA BACKGROUND */
 .space-nebula {
   position: fixed;
   inset: 0;
@@ -51,7 +49,6 @@ body {
   z-index: 0;
   overflow: hidden;
 }
-
 .nebula-layer {
   position: absolute;
   width: 100%;
@@ -61,50 +58,36 @@ body {
   opacity: 0.7;
   animation: driftNebula 28s infinite alternate ease-in-out;
 }
-
 .nebula-layer:nth-child(2) {
   background: radial-gradient(ellipse at 85% 25%, rgba(60, 150, 220, 0.3) 0%, transparent 70%);
   filter: blur(80px);
   animation-duration: 35s;
-  animation-delay: -5s;
   opacity: 0.6;
 }
-
 .nebula-layer:nth-child(3) {
   background: radial-gradient(ellipse at 40% 80%, rgba(200, 100, 230, 0.2) 0%, transparent 60%);
   filter: blur(100px);
   animation-duration: 42s;
-  animation-delay: -12s;
   opacity: 0.5;
 }
-
 @keyframes driftNebula {
   0% { transform: scale(1) translate(0%, 0%); opacity: 0.5; }
   100% { transform: scale(1.2) translate(4%, -3%); opacity: 0.8; }
 }
-
-/* stars twinkling + dust */
 .star-dust {
   position: fixed;
   inset: 0;
-  background-image: 
-    radial-gradient(1px 1px at 12% 88%, #fff 0.5px, transparent 0.5px),
+  background-image: radial-gradient(1px 1px at 12% 88%, #fff 0.5px, transparent 0.5px),
     radial-gradient(2px 2px at 56% 23%, #ffe5b4 1px, transparent 1px),
     radial-gradient(1px 1px at 78% 44%, #c2dcff 0.5px, transparent 0.5px),
     radial-gradient(1.5px 1.5px at 33% 72%, #f0e6ff 0.7px, transparent 0.7px),
-    radial-gradient(2px 2px at 93% 15%, white 1px, transparent 1px),
-    radial-gradient(1px 1px at 48% 39%, #ffd8b5 0.5px, transparent 0.5px),
-    radial-gradient(1.5px 1.5px at 64% 91%, #ffffff 0.8px, transparent 0.8px),
-    radial-gradient(2px 2px at 5% 34%, #a4c2ff 1px, transparent 1px),
-    radial-gradient(1px 1px at 82% 67%, #ded2ff 0.5px, transparent 0.5px);
+    radial-gradient(2px 2px at 93% 15%, white 1px, transparent 1px);
   background-size: 200px 200px;
   background-repeat: repeat;
-  opacity: 0.6;
+  opacity: 0.5;
   pointer-events: none;
   z-index: 1;
 }
-
-/* shooting star effect */
 .shooting-star {
   position: fixed;
   top: -10px;
@@ -125,20 +108,17 @@ body {
   18% { transform: translate(85vw, 35vh) rotate(25deg); opacity: 0; }
   100% { opacity: 0; }
 }
-.shooting-star:nth-child(2) { animation-duration: 18s; animation-delay: 6s; left: 20%; }
+.shooting-star:nth-child(2) { animation-duration: 18s; animation-delay: 6s; }
 .shooting-star:nth-child(3) { animation-duration: 25s; animation-delay: 2s; top: 15%; left: -5%; }
 
-/* Cosmic container */
 .cosmic-container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 1.4rem 1.6rem 3rem;
   position: relative;
   z-index: 10;
-  backdrop-filter: blur(0px);
 }
 
-/* Header glow */
 .cosmic-header {
   display: flex;
   justify-content: space-between;
@@ -151,7 +131,6 @@ body {
   background: linear-gradient(90deg, rgba(10,20,40,0.4) 0%, rgba(0,0,0,0) 100%);
   border-radius: 0 0 12px 0;
 }
-
 .logo-celestial h1 {
   font-family: 'Space Mono', monospace;
   font-weight: 400;
@@ -170,7 +149,6 @@ body {
   color: var(--text-mist);
   margin-top: 5px;
 }
-
 .sky-weather-pulse {
   background: rgba(10, 16, 30, 0.7);
   backdrop-filter: blur(12px);
@@ -181,21 +159,11 @@ body {
   align-items: center;
   gap: 10px;
   font-size: 0.7rem;
-  font-weight: 400;
   font-family: 'Space Mono', monospace;
 }
-.weather-icon {
-  font-size: 1rem;
-  filter: drop-shadow(0 0 3px cyan);
-}
-.weather-text {
-  color: var(--nebula-cyan);
-}
-
-/* 2 Column main layout (more celestial flow) */
 .main-cosmic-grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 340px;
   gap: 2rem;
 }
 @media (max-width: 860px) {
@@ -203,17 +171,39 @@ body {
   .cosmic-container { padding: 1rem; }
 }
 
-/* devotional core panel */
+/* image cosmic banner */
+.nebula-image-banner {
+  background: var(--glass-panel);
+  backdrop-filter: blur(8px);
+  border-radius: 32px;
+  margin-bottom: 1.8rem;
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.cosmic-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.2s ease;
+}
+.image-credit {
+  padding: 0.4rem 1rem;
+  font-size: 0.55rem;
+  text-align: right;
+  color: var(--text-dim);
+  background: rgba(0,0,0,0.4);
+  letter-spacing: 0.5px;
+}
 .devotional-core {
   background: var(--glass-panel);
   backdrop-filter: blur(14px);
   border-radius: 32px;
   border: 1px solid var(--glass-border);
-  box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+  box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
   padding: 2rem 2rem 2.2rem;
-  transition: all 0.25s;
 }
-
 .celestial-badge {
   display: flex;
   align-items: center;
@@ -222,10 +212,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--nebula-cyan);
-  margin-bottom: 1.2rem;
-}
-.celestial-badge i {
-  font-size: 0.7rem;
+  margin-bottom: 1rem;
 }
 .star-date {
   font-family: 'Space Mono', monospace;
@@ -254,8 +241,6 @@ body {
   font-size: 0.85rem;
   line-height: 1.65;
   margin-bottom: 1.5rem;
-  font-style: normal;
-  font-weight: 400;
   color: #cfdcff;
 }
 .reflection-text {
@@ -277,20 +262,17 @@ body {
   color: var(--star-gold);
   margin-bottom: 0.6rem;
 }
-
-/* Right Sidebar: Weather + archive nebula style */
 .sidebar-cosmic {
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
 }
-
-.weather-live-panel, .archive-nebula {
+.weather-live-panel, .archive-nebula, .support-card {
   background: var(--glass-panel);
   backdrop-filter: blur(12px);
   border-radius: 28px;
   border: 1px solid rgba(110, 140, 230, 0.25);
-  padding: 1.2rem 1.2rem 1.2rem;
+  padding: 1.2rem;
 }
 .panel-head {
   display: flex;
@@ -305,21 +287,10 @@ body {
   border-bottom: 1px dashed rgba(120,150,200,0.3);
   padding-bottom: 0.6rem;
 }
-.weather-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 .weather-temp {
-  font-size: 2.1rem;
+  font-size: 2rem;
   font-weight: 600;
   font-family: 'Space Mono', monospace;
-  letter-spacing: -2px;
-}
-.weather-condition {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  color: var(--text-mist);
 }
 .moon-phase-micro {
   display: flex;
@@ -332,12 +303,11 @@ body {
 .loc-text {
   font-size: 0.6rem;
   color: var(--star-silver);
-  font-family: monospace;
 }
 .archive-list-scroll {
-  max-height: 360px;
+  max-height: 320px;
   overflow-y: auto;
-  margin-top: 5px;
+  margin-top: 8px;
 }
 .archive-entry-celestial {
   padding: 0.55rem 0.3rem;
@@ -350,7 +320,7 @@ body {
   border-radius: 12px;
 }
 .archive-entry-celestial:hover {
-  background: rgba(106, 90, 205, 0.2);
+  background: rgba(106, 90, 205, 0.3);
   transform: translateX(4px);
 }
 .archive-dot {
@@ -363,8 +333,6 @@ body {
 .archive-date {
   font-size: 0.65rem;
   font-family: monospace;
-  font-weight: 500;
-  color: var(--star-silver);
 }
 .archive-search {
   display: flex;
@@ -389,26 +357,57 @@ body {
   padding: 0 14px;
   color: white;
   cursor: pointer;
-  transition: 0.2s;
 }
-.refresh-btn-cosmic {
+.btn-cosmic {
   background: transparent;
   border: 1px solid rgba(150, 170, 255, 0.5);
   font-size: 0.6rem;
-  padding: 5px 12px;
+  padding: 6px 12px;
   border-radius: 20px;
   color: #b1c3ff;
   cursor: pointer;
-  margin-top: 12px;
   width: 100%;
+  margin-top: 12px;
   transition: 0.2s;
+}
+.btn-cosmic:hover {
+  background: rgba(100, 120, 200, 0.3);
+  border-color: #8cabff;
+}
+.support-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+.support-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 60px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.2s;
+  color: var(--star-gold);
+  border: 1px solid rgba(232, 201, 122, 0.3);
+}
+.support-btn i {
+  font-size: 0.9rem;
+}
+.support-btn:hover {
+  background: rgba(232, 201, 122, 0.15);
+  border-color: #ffdf9c;
 }
 .loader-glow {
   display: flex;
   gap: 10px;
   align-items: center;
-  padding: 20px;
   justify-content: center;
+  padding: 20px;
   color: #bfcaff;
 }
 .footer-cosmic {
@@ -419,29 +418,21 @@ body {
   border-top: 1px solid rgba(100, 120, 200, 0.2);
   padding-top: 1.5rem;
 }
-
-/* small tweaks */
-i, .fas, .far { color: inherit; }
+i, .fas { color: inherit; }
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: #030614; }
 ::-webkit-scrollbar-thumb { background: #4d6bcf; border-radius: 10px; }
 </style>
 </head>
 <body>
-<div class="space-nebula">
-  <div class="nebula-layer"></div>
-  <div class="nebula-layer"></div>
-  <div class="nebula-layer"></div>
-</div>
+<div class="space-nebula"><div class="nebula-layer"></div><div class="nebula-layer"></div><div class="nebula-layer"></div></div>
 <div class="star-dust"></div>
-<div class="shooting-star"></div>
-<div class="shooting-star"></div>
-<div class="shooting-star"></div>
+<div class="shooting-star"></div><div class="shooting-star"></div><div class="shooting-star"></div>
 
 <div class="cosmic-container">
   <div class="cosmic-header">
     <div class="logo-celestial">
-      <h1>✦ NEBULA DEVOTIONS ✦</h1>
+      <h1>✦ OUR NIGHT SKY DEVOTIONS ✦</h1>
       <p>where heavens speak & spirit breathes</p>
     </div>
     <div class="sky-weather-pulse" id="weatherWidget">
@@ -450,8 +441,14 @@ i, .fas, .far { color: inherit; }
     </div>
   </div>
 
+  <!-- Random Cosmic Image Banner (Nebula / Galaxy) -->
+  <div class="nebula-image-banner" id="nebulaBanner">
+    <img id="cosmicImage" class="cosmic-img" src="https://picsum.photos/id/104/1200/300" alt="nebula vision">
+    <div class="image-credit" id="imageCredit">✨ celestial canvas · random nebula</div>
+  </div>
+
   <div class="main-cosmic-grid">
-    <!-- MAIN DEVOTIONAL NEBULA CORE -->
+    <!-- MAIN DEVOTIONAL -->
     <div class="devotional-core" id="devotionalCore">
       <div class="celestial-badge"><i class="fas fa-star-of-life"></i> TODAY'S CELESTIAL MEDITATION</div>
       <div class="star-date" id="starDateDisplay">—— • ——</div>
@@ -459,139 +456,170 @@ i, .fas, .far { color: inherit; }
       <div id="devotionalContent" style="display: none;"></div>
     </div>
 
-    <!-- RIGHT SIDEBAR : NIGHT SKY WEATHER + ARCHIVE -->
+    <!-- RIGHT SIDEBAR -->
     <div class="sidebar-cosmic">
-      <!-- Live Local Sky Weather Card -->
+      <!-- Live Sky Weather -->
       <div class="weather-live-panel">
         <div class="panel-head"><i class="fas fa-meteor"></i> NIGHT SKY CONDITIONS</div>
-        <div id="liveWeatherData">
-          <div class="loader-glow" style="padding: 0.5rem;"><i class="fas fa-spinner fa-pulse"></i> reading celestial winds...</div>
-        </div>
+        <div id="liveWeatherData"><div class="loader-glow"><i class="fas fa-spinner fa-pulse"></i> reading celestial winds...</div></div>
       </div>
 
       <!-- Archive Nebula -->
       <div class="archive-nebula">
         <div class="panel-head"><i class="fas fa-scroll"></i> STAR ARCHIVE</div>
         <div class="archive-search">
-          <input type="text" id="archiveSearchInput" placeholder="search by date (YYYY-MM-DD) ..." autocomplete="off">
+          <input type="text" id="archiveSearchInput" placeholder="search by date (YYYY-MM-DD) ...">
           <button id="searchArchiveBtn"><i class="fas fa-search"></i></button>
         </div>
-        <div class="archive-list-scroll" id="archiveListContainer">
-          <div class="loader-glow"><i class="fas fa-circle-notch fa-spin"></i> loading stellar archive...</div>
+        <div class="archive-list-scroll" id="archiveListContainer"><div class="loader-glow"><i class="fas fa-circle-notch fa-spin"></i> loading archive...</div></div>
+        <button class="btn-cosmic" id="refreshArchiveBtn"><i class="fas fa-sync-alt"></i> &nbsp;REFRESH ARCHIVE</button>
+      </div>
+
+      <!-- Support & Links Card -->
+      <div class="support-card">
+        <div class="panel-head"><i class="fas fa-heart"></i> SUPPORT THIS MINISTRY</div>
+        <div class="support-links">
+          <a href="https://buymeacoffee.com/ournightsky" target="_blank" rel="noopener" class="support-btn">
+            <i class="fas fa-mug-hot"></i> Buy Me a Coffee
+          </a>
+          <a href="https://ournightsky.us" target="_blank" rel="noopener" class="support-btn">
+            <i class="fas fa-globe"></i> Visit OurNightSky.Us
+          </a>
         </div>
-        <button class="refresh-btn-cosmic" id="refreshArchiveBtn"><i class="fas fa-sync-alt"></i> &nbsp;REFRESH ARCHIVE</button>
+        <div style="font-size:0.55rem; text-align:center; margin-top: 12px; color:#5f7399;">keep the stars shining ✨</div>
       </div>
     </div>
   </div>
-  <div class="footer-cosmic">
-    <i class="fas fa-moon"></i> “Lift your eyes and see — who created these?” (Isaiah 40:26) • nebula devotionals
-  </div>
+  <div class="footer-cosmic"><i class="fas fa-moon"></i> “Lift your eyes and see — who created these?” (Isaiah 40:26) • ournightsky.us</div>
 </div>
 
 <script>
-  // ========== CELESTIAL CONFIG ==========
+  // ========== CONFIG & GLOBALS ==========
   const GITHUB_RAW = 'https://raw.githubusercontent.com/NAGOHUSA/OurNightSky_Devotionals/main/devotionals/';
   const GITHUB_API = 'https://api.github.com/repos/NAGOHUSA/OurNightSky_Devotionals/contents/devotionals';
   let archiveCache = [];
 
-  // helpers
-  function formatStarDate() {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = d.toLocaleString('default', { month: 'long' }).toUpperCase();
-    const day = d.getDate();
-    return `${month} ${day}, ${year}  ✦  celestial hour`;
+  // ---------- RANDOM NEBULA / GALAXY IMAGE (no APOD) ----------
+  // using high-quality free space image APIs + curated Unsplash space collections fallback + public domain
+  const spaceImageSources = [
+    // direct high-res nebula images from public domain / CC (Webb/ Hubble inspired but safe)
+    "https://cdn.pixabay.com/photo/2019/11/19/11/21/galaxy-4637390_1280.jpg",
+    "https://cdn.pixabay.com/photo/2017/08/30/01/05/milky-way-2695569_1280.jpg",
+    "https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616_1280.jpg",
+    "https://cdn.pixabay.com/photo/2015/02/12/14/06/nebula-634639_1280.jpg",
+    "https://cdn.pixabay.com/photo/2019/09/26/07/13/nebula-4505557_1280.jpg",
+    "https://cdn.pixabay.com/photo/2013/11/28/10/43/astronomy-220055_1280.jpg",
+    "https://cdn.pixabay.com/photo/2019/11/07/20/43/space-4610122_1280.jpg",
+    "https://cdn.pixabay.com/photo/2012/11/21/10/24/star-66827_1280.jpg",
+    "https://cdn.pixabay.com/photo/2016/10/20/18/35/earth-1756274_1280.jpg",
+    "https://cdn.pixabay.com/photo/2017/08/22/11/56/space-2668085_1280.jpg",
+    "https://cdn.pixabay.com/photo/2019/11/18/10/29/andromeda-4634713_1280.jpg",
+    "https://live.staticflickr.com/65535/53568486502_ca8806a3b2_h.jpg",  // Carina Nebula-like (CC)
+    "https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    "https://images.pexels.com/photos/1324769/pexels-photo-1324769.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    "https://images.pexels.com/photos/1169754/pexels-photo-1169754.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+  ];
+  // additional deep field galaxies (random from valid public domain sources)
+  const secondaryImages = [
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Helix_Nebula.jpg/1024px-Helix_Nebula.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/e/e5/Orion_Nebula_-_Hubble_2006.jpg",
+    "https://www.nasa.gov/sites/default/files/thumbnails/image/hubble_helix_nebula.jpg"
+  ];
+  const allImages = [...spaceImageSources, ...secondaryImages];
+  
+  function getRandomCosmicImage() {
+    const randomIndex = Math.floor(Math.random() * allImages.length);
+    return allImages[randomIndex];
   }
 
-  // approximate moon phase + pretty output 
-  function getMoonPhaseIcon(phaseIndex) {
-    const phases = ['🌑 New', '🌒 Waxing Crescent', '🌓 First Quarter', '🌔 Waxing Gibbous', '🌕 Full', '🌖 Waning Gibbous', '🌗 Last Quarter', '🌘 Waning Crescent'];
-    return phases[phaseIndex % 8];
+  async function loadRandomNebulaImage() {
+    const imgElement = document.getElementById('cosmicImage');
+    const creditSpan = document.getElementById('imageCredit');
+    if (!imgElement) return;
+    const imgUrl = getRandomCosmicImage();
+    imgElement.src = imgUrl;
+    imgElement.onerror = () => {
+      // fallback to a safe pixabay nebula
+      imgElement.src = "https://cdn.pixabay.com/photo/2019/11/19/11/21/galaxy-4637390_1280.jpg";
+      creditSpan.innerText = "✨ celestial art · pixabay";
+    };
+    creditSpan.innerHTML = "🌌 random nebula / galaxy · inspired by cosmic wonders";
   }
+
+  // ---------- WEATHER + LOCATION (live night sky) ----------
+  let userLat = null, userLon = null;
   function computeMoonPhasePretty() {
     const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = date.getDate();
-    const lp = 2551443; // moon cycle seconds
-    const newMoon = new Date(2000, 0, 6, 18, 14).getTime();
-    const phase = ((date.getTime() - newMoon) / 1000 % lp) / lp;
-    const idx = Math.floor(phase * 8);
-    return getMoonPhaseIcon(idx);
+    const newMoonRef = new Date(2000, 0, 6, 18, 14).getTime();
+    const lp = 2551443;
+    const phase = ((date.getTime() - newMoonRef) / 1000 % lp) / lp;
+    const phases = ['🌑 New', '🌒 Waxing Crescent', '🌓 First Quarter', '🌔 Waxing Gibbous', '🌕 Full', '🌖 Waning Gibbous', '🌗 Last Quarter', '🌘 Waning Crescent'];
+    return phases[Math.floor(phase * 8)];
   }
 
-  // 🌙 weather & location (Browser geolocation + Open-Meteo)
-  let userLat = null, userLon = null;
   async function fetchLocalWeather() {
     const weatherDiv = document.getElementById('liveWeatherData');
     if (!weatherDiv) return;
-    weatherDiv.innerHTML = `<div class="loader-glow" style="padding:0.2rem;"><i class="fas fa-globe fa-spin"></i> detecting sky portal...</div>`;
+    weatherDiv.innerHTML = `<div class="loader-glow" style="padding:0.3rem;"><i class="fas fa-globe fa-spin"></i> detecting sky portal...</div>`;
     try {
       const position = await new Promise((resolve, reject) => {
-        if (!navigator.geolocation) reject(new Error("Geolocation not supported"));
+        if (!navigator.geolocation) reject(new Error("no geolocation"));
         navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
       });
       userLat = position.coords.latitude;
       userLon = position.coords.longitude;
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${userLat}&longitude=${userLon}&current_weather=true&timezone=auto&forecast_days=1`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${userLat}&longitude=${userLon}&current_weather=true&timezone=auto`;
       const res = await fetch(url);
       const data = await res.json();
       if (data.current_weather) {
         const w = data.current_weather;
         const tempC = w.temperature;
         const wind = w.windspeed;
-        const weatherCode = w.weathercode;
-        let condition = "clear skies";
-        if (weatherCode >= 61 && weatherCode <= 65) condition = "rain veils";
-        else if (weatherCode >= 71 && weatherCode <= 77) condition = "snow nebula";
-        else if (weatherCode >= 80 && weatherCode <= 82) condition = "shower comets";
-        else if (weatherCode >= 95) condition = "storm aurora";
-        else condition = "stellar clarity";
+        let condition = "stellar clear";
+        if (w.weathercode >= 61 && w.weathercode <= 65) condition = "rain veils";
+        else if (w.weathercode >= 71 && w.weathercode <= 77) condition = "snow nebula";
+        else if (w.weathercode >= 80 && w.weathercode <= 82) condition = "shower comets";
+        else if (w.weathercode >= 95) condition = "storm aurora";
         const moonPhaseStr = computeMoonPhasePretty();
         weatherDiv.innerHTML = `
-          <div class="weather-detail">
-            <div class="weather-temp">${Math.round(tempC)}°C</div>
-            <div class="weather-condition"><i class="fas fa-wind"></i> ${condition} · wind ${Math.round(wind)} km/h</div>
-            <div class="moon-phase-micro"><span><i class="fas fa-moon"></i> ${moonPhaseStr}</span><span class="loc-text"><i class="fas fa-map-marker-alt"></i> ${userLat.toFixed(2)}°, ${userLon.toFixed(2)}°</span></div>
-            <div style="font-size:0.6rem; margin-top: 6px;"><i class="fas fa-cloud-moon"></i> local night sky · live</div>
-          </div>`;
-        // update global weather widget too
+          <div class="weather-temp">${Math.round(tempC)}°C</div>
+          <div class="weather-condition"><i class="fas fa-wind"></i> ${condition} · wind ${Math.round(wind)} km/h</div>
+          <div class="moon-phase-micro"><span><i class="fas fa-moon"></i> ${moonPhaseStr}</span><span class="loc-text"><i class="fas fa-map-marker-alt"></i> ${userLat.toFixed(1)}°, ${userLon.toFixed(1)}°</span></div>
+          <div style="font-size:0.6rem; margin-top:6px;">🌙 night sky observation</div>`;
         document.getElementById('weatherSummary').innerHTML = `${condition} ${Math.round(tempC)}°C`;
-        document.querySelector('.weather-icon').className = weatherCode>=80 ? "fas fa-cloud-rain weather-icon" : "fas fa-cloud-moon weather-icon";
       } else throw new Error();
     } catch (err) {
-      weatherDiv.innerHTML = `<div style="font-size:0.7rem; text-align:center;">✨ unable to determine local sky ✨<br><span style="font-size:0.55rem;">using celestial mode</span></div>`;
+      weatherDiv.innerHTML = `<div style="font-size:0.7rem; text-align:center;">✨ celestial drift — no local fix<br><span style="font-size:0.55rem;">using universal sky</span></div>`;
       document.getElementById('weatherSummary').innerHTML = "nebula veiled";
     }
   }
 
-  // render devotional content from JSON
+  // ---------- DEVOTIONAL RENDER ----------
+  function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
   function renderDevotional(data, dateStr) {
     const container = document.getElementById('devotionalContent');
     const loader = document.getElementById('devotionalLoader');
-    if (!container) return;
     if (!data) {
-      container.innerHTML = `<div class="reflection-text" style="padding:1rem; text-align:center;"><i class="fas fa-comet"></i> Today’s whisper from the stars is in silent prayer.<br>Explore archive to find past reflections.</div>`;
+      container.innerHTML = `<div class="reflection-text" style="text-align:center;"><i class="fas fa-comet"></i> Today's reflection awaits in stillness.<br>Explore archive entries.</div>`;
       loader.style.display = 'none';
       container.style.display = 'block';
       return;
     }
-    let title = data.title || 'Cosmic Meditation';
+    let title = data.title || 'Celestial Meditation';
     let scripture = data.scripture || 'The heavens declare the glory of God (Psalm 19)';
     let reflection = data.reflection || 'Look up — the vastness speaks of His majesty, each star a reminder of faithfulness.';
     let prayer = data.prayer || 'Lord of light and nebulae, guide our hearts beneath your infinite sky. Amen.';
-    // fallback markdown parse if needed
     if (data.content_markdown) {
       const md = data.content_markdown;
-      if (!title && md) title = md.split('\n')[0].replace(/^#+\s*/, '').trim() || title;
+      if (!title) title = md.split('\n')[0].replace(/^#+\s*/, '').trim();
       const scMatch = md.match(/## Scripture\n([\s\S]*?)(?=\n## |$)/i);
-      if (scMatch && scMatch[1]) scripture = scMatch[1].trim();
+      if (scMatch) scripture = scMatch[1].trim();
       const refMatch = md.match(/## Reflection\n([\s\S]*?)(?=\n## |$)/i);
-      if (refMatch && refMatch[1]) reflection = refMatch[1].trim();
+      if (refMatch) reflection = refMatch[1].trim();
       const prMatch = md.match(/## Prayer\n([\s\S]*?)$/i);
-      if (prMatch && prMatch[1]) prayer = prMatch[1].trim();
+      if (prMatch) prayer = prMatch[1].trim();
     }
-    const displayDateNice = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const displayDate = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     container.innerHTML = `
       <div class="devotional-title">${escapeHtml(title)}</div>
       <div class="scripture-glow"><i class="fas fa-quote-left" style="opacity:0.6; margin-right:6px;"></i> ${escapeHtml(scripture)}</div>
@@ -601,7 +629,6 @@ i, .fas, .far { color: inherit; }
     loader.style.display = 'none';
     container.style.display = 'block';
   }
-  function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
 
   async function loadTodayDevotional() {
     const today = new Date().toISOString().slice(0,10);
@@ -612,34 +639,32 @@ i, .fas, .far { color: inherit; }
     } catch(e) { renderDevotional(null, today); }
   }
 
-  // Archive functions
+  // ---------- ARCHIVE ----------
   async function loadArchiveIndex() {
     try {
-      const response = await fetch(GITHUB_API);
-      if (!response.ok) throw new Error();
-      const files = await response.json();
+      const resp = await fetch(GITHUB_API);
+      if (!resp.ok) throw new Error();
+      const files = await resp.json();
       archiveCache = files.filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f.name))
         .map(f => ({ date: f.name.replace('.json', ''), url: f.download_url || (GITHUB_RAW + f.name) }))
         .sort((a,b) => b.date.localeCompare(a.date));
       renderArchiveList('');
-    } catch(e) {
-      document.getElementById('archiveListContainer').innerHTML = `<div class="loader-glow" style="color:#a77aff;">⚠️ archive stardust unreachable</div>`;
-    }
+    } catch(e) { document.getElementById('archiveListContainer').innerHTML = `<div class="loader-glow">⚠️ archive unreachable</div>`; }
   }
 
   function renderArchiveList(filter) {
     const container = document.getElementById('archiveListContainer');
     const q = filter.trim().toLowerCase();
     let items = q ? archiveCache.filter(f => f.date.includes(q)) : archiveCache;
-    if (!items.length) { container.innerHTML = '<div style="padding: 1rem; text-align:center; font-size:0.7rem;">no celestial entry found</div>'; return; }
-    container.innerHTML = items.slice(0, 55).map(entry => `
+    if (!items.length) { container.innerHTML = '<div style="padding:1rem; text-align:center; font-size:0.7rem;">✨ no celestial entry found</div>'; return; }
+    container.innerHTML = items.slice(0, 50).map(entry => `
       <div class="archive-entry-celestial" data-url="${escapeHtml(entry.url)}" data-date="${entry.date}">
         <div class="archive-dot"></div>
         <div class="archive-date">✦ ${entry.date}</div>
       </div>
     `).join('');
     document.querySelectorAll('.archive-entry-celestial').forEach(el => {
-      el.addEventListener('click', async (e) => {
+      el.addEventListener('click', async () => {
         const url = el.getAttribute('data-url');
         const date = el.getAttribute('data-date');
         const loaderDiv = document.getElementById('devotionalLoader');
@@ -647,43 +672,35 @@ i, .fas, .far { color: inherit; }
         loaderDiv.style.display = 'flex';
         contentDiv.style.display = 'none';
         loaderDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> opening cosmic scroll...';
-        try {
-          const resp = await fetch(url);
-          if (!resp.ok) throw new Error();
-          renderDevotional(await resp.json(), date);
-        } catch(err) { renderDevotional(null, date); }
+        try { const r = await fetch(url); if(r.ok) renderDevotional(await r.json(), date); else renderDevotional(null, date); } 
+        catch(err) { renderDevotional(null, date); }
         document.getElementById('starDateDisplay').innerHTML = `${date}  ✦  archived reflection`;
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     });
   }
 
-  function handleArchiveSearch() {
-    const val = document.getElementById('archiveSearchInput').value;
-    renderArchiveList(val);
-  }
+  function handleArchiveSearch() { renderArchiveList(document.getElementById('archiveSearchInput').value); }
   function refreshEverything() {
     loadArchiveIndex().then(()=>renderArchiveList(''));
     loadTodayDevotional();
     fetchLocalWeather();
-    document.getElementById('starDateDisplay').innerHTML = formatStarDate();
+    loadRandomNebulaImage();
+    document.getElementById('starDateDisplay').innerHTML = new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }).toUpperCase() + ' ✦ celestial hour';
   }
 
   document.getElementById('searchArchiveBtn').addEventListener('click', handleArchiveSearch);
-  document.getElementById('refreshArchiveBtn').addEventListener('click', ()=>{
-    loadArchiveIndex().then(()=>renderArchiveList(''));
-  });
+  document.getElementById('refreshArchiveBtn').addEventListener('click', ()=>{ loadArchiveIndex().then(()=>renderArchiveList('')); });
   document.getElementById('archiveSearchInput').addEventListener('keydown', e => { if(e.key === 'Enter') handleArchiveSearch(); });
 
-  // init cosmic
-  (function initCosmic() {
-    document.getElementById('starDateDisplay').innerHTML = formatStarDate();
+  (function init() {
+    document.getElementById('starDateDisplay').innerHTML = new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }).toUpperCase() + ' ✦ celestial hour';
+    loadRandomNebulaImage();
     fetchLocalWeather();
     loadTodayDevotional();
-    loadArchiveIndex().then(() => renderArchiveList(''));
-    setInterval(() => {
-      if (document.visibilityState === 'visible') fetchLocalWeather();
-    }, 10 * 60 * 1000);
+    loadArchiveIndex().then(()=>renderArchiveList(''));
+    setInterval(() => { if(document.visibilityState === 'visible') fetchLocalWeather(); }, 12*60*1000);
+    setInterval(() => loadRandomNebulaImage(), 1800000); // change image each 30min if desired but random each refresh
   })();
 </script>
 </body>
