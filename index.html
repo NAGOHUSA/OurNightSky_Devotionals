@@ -1,628 +1,557 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Our Night Sky · Celestial Devotionals</title>
-  <meta name="description" content="Daily devotionals inspired by the heavens. Scripture, reflection & prayer under the stars — OurNightSky.Us">
-  <meta name="theme-color" content="#0a0f1e">
-  <!-- Google Fonts & smooth rendering -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Night Sky · Celestial Devotionals</title>
+<meta name="description" content="Daily devotionals inspired by the heavens. Scripture, reflection & prayer under the stars — OurNightSky.Us">
+<meta name="theme-color" content="#070910">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+:root {
+  --bg: #070910;
+  --bg2: #0d1117;
+  --bg3: #111927;
+  --panel: rgba(13,18,28,0.85);
+  --border: rgba(140,170,220,0.12);
+  --border-hi: rgba(140,170,220,0.28);
+  --accent: #4a7fff;
+  --accent2: #7eb8ff;
+  --gold: #e8c97a;
+  --gold2: #f5dfa0;
+  --text: #d4ddf0;
+  --text2: #8a9ab8;
+  --text3: #5a6a88;
+  --pip: #4a7fff;
+  --mono: 'JetBrains Mono', monospace;
+  --cond: 'Barlow Condensed', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { background: var(--bg); color: var(--text); font-family: var(--mono); }
+body { min-height: 100vh; }
 
-    body {
-      background: radial-gradient(circle at 10% 20%, #0b1120, #03060c);
-      color: #ece8e0;
-      font-family: 'Inter', sans-serif;
-      line-height: 1.5;
-      scroll-behavior: smooth;
-    }
+/* STAR FIELD */
+.stars {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(1.5px 1.5px at 12% 8%, rgba(200,220,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 34% 22%, rgba(200,220,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 57% 14%, rgba(255,240,200,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 78% 6%, rgba(200,220,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 91% 31%, rgba(200,220,255,0.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 4% 45%, rgba(255,240,200,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 23% 60%, rgba(200,220,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 67% 55%, rgba(200,220,255,0.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 85% 72%, rgba(255,240,200,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 44% 80%, rgba(200,220,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 88%, rgba(200,220,255,0.3) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 62% 93%, rgba(200,220,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 91%, rgba(255,240,200,0.4) 0%, transparent 100%);
+}
 
-    /* star particle overlay */
-    .star-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      background-image: radial-gradient(2px 2px at 20px 30px, #fef9d7, rgba(0,0,0,0)),
-                        radial-gradient(1px 1px at 80px 240px, #fff6c6, rgba(0,0,0,0));
-      background-size: 200px 200px, 150px 150px;
-      background-repeat: repeat;
-      opacity: 0.35;
-      z-index: 0;
-    }
+.wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem 1.5rem 4rem; position: relative; z-index: 2; }
 
-    .container {
-      max-width: 880px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 4rem;
-      position: relative;
-      z-index: 2;
-    }
+/* ── HEADER ── */
+.site-header {
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem; margin-bottom: 2rem;
+  flex-wrap: wrap; gap: 1rem;
+}
+.logo-block { display: flex; align-items: baseline; gap: 1rem; }
+.logo-wordmark {
+  font-family: var(--cond); font-size: 1.6rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gold2);
+}
+.logo-tag {
+  font-family: var(--mono); font-size: 0.65rem; font-weight: 400;
+  color: var(--text3); letter-spacing: 0.15em; text-transform: uppercase;
+}
+.header-right { display: flex; align-items: center; gap: 1.2rem; }
+.pip-row { display: flex; gap: 6px; align-items: center; }
+.pip {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--pip); opacity: 0.4;
+  animation: pip-pulse 2.5s ease-in-out infinite;
+}
+.pip:nth-child(2) { animation-delay: 0.4s; background: var(--gold); }
+.pip:nth-child(3) { animation-delay: 0.8s; background: var(--accent2); }
+@keyframes pip-pulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.85); }
+  50%       { opacity: 1;   transform: scale(1.1); }
+}
+.section-label {
+  font-family: var(--mono); font-size: 0.6rem; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--text3);
+}
 
-    /* header / aurora touch */
-    .hero {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(210, 200, 180, 0.2);
-    }
-    .logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.7rem;
-      font-weight: 500;
-      letter-spacing: -0.3px;
-      background: linear-gradient(135deg, #fff3e0, #b9d4ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .logo i {
-      background: none;
-      -webkit-background-clip: unset;
-      background-clip: unset;
-      color: #c1d9ff;
-      font-size: 1.8rem;
-      text-shadow: 0 0 6px #7ac0ff;
-    }
-    .tagline {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 1.1rem;
-      color: #b9cdff;
-      margin-top: 8px;
-      letter-spacing: 0.3px;
-    }
+/* ── THREE COLUMNS ── */
+.three-col {
+  display: grid;
+  grid-template-columns: 220px 1fr 210px;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .three-col { grid-template-columns: 1fr; }
+}
 
-    /* daily card */
-    .daily-card {
-      background: rgba(12, 20, 35, 0.65);
-      backdrop-filter: blur(12px);
-      border-radius: 2.5rem;
-      padding: 2rem 2rem 2.2rem;
-      margin: 1.5rem 0 2.2rem;
-      border: 1px solid rgba(210, 220, 250, 0.18);
-      box-shadow: 0 25px 40px -15px rgba(0,0,0,0.5);
-      transition: all 0.2s;
-    }
-    .devotional-date {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-weight: 500;
-      color: #9fb7e9;
-      border-left: 3px solid #6d8fdf;
-      padding-left: 14px;
-      margin-bottom: 1.4rem;
-    }
-    h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.4rem;
-      font-weight: 600;
-      line-height: 1.2;
-      margin-bottom: 1rem;
-      color: #ffe8cf;
-    }
-    .scripture {
-      background: rgba(0, 0, 0, 0.3);
-      padding: 1rem 1.4rem;
-      border-radius: 2rem;
-      font-style: italic;
-      margin: 1.2rem 0 1.5rem;
-      border-left: 4px solid #8aabe8;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.2rem;
-      color: #e2eaff;
-    }
-    .reflection, .prayer {
-      margin: 1.4rem 0;
-    }
-    .reflection p, .prayer p {
-      font-size: 1.03rem;
-      line-height: 1.65;
-      color: #e8e2d4;
-    }
-    .reflection strong, .prayer strong {
-      color: #ffefc0;
-      font-weight: 500;
-    }
-    .prayer {
-      background: rgba(60, 80, 120, 0.2);
-      border-radius: 1.8rem;
-      padding: 1.2rem 1.4rem;
-      margin-top: 1.8rem;
-    }
-    .loader {
-      text-align: center;
-      padding: 2rem;
-      color: #bdd4ff;
-    }
-    .error-box {
-      background: #311c1c80;
-      border-radius: 1.5rem;
-      padding: 1.5rem;
-      text-align: center;
-      color: #ffbebe;
-    }
+/* ── PANEL ── */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  backdrop-filter: blur(8px);
+}
+.panel-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--text3);
+}
+.panel-header .pip { width: 5px; height: 5px; animation-duration: 3s; }
 
-    /* archive section */
-    .archive-section {
-      margin-top: 3rem;
-      background: rgba(0, 0, 0, 0.25);
-      border-radius: 2rem;
-      padding: 1.5rem 1.2rem;
-    }
-    .archive-header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px dashed #3f4a6b;
-      padding-bottom: 0.7rem;
-    }
-    .archive-header h2 {
-      font-size: 1.5rem;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .search-wrap {
-      display: flex;
-      background: #0e1625;
-      border-radius: 3rem;
-      padding: 0.2rem 0.2rem 0.2rem 1rem;
-      border: 1px solid #2a3650;
-    }
-    .search-wrap input {
-      background: transparent;
-      border: none;
-      padding: 0.5rem 0;
-      color: #f0f2fa;
-      font-size: 0.85rem;
-      min-width: 160px;
-      outline: none;
-    }
-    .search-wrap button {
-      background: #2f3b5c;
-      border: none;
-      border-radius: 2rem;
-      padding: 0.4rem 1rem;
-      color: white;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .search-wrap button:hover {
-      background: #4f6190;
-    }
-    .archive-list {
-      max-height: 450px;
-      overflow-y: auto;
-      border-radius: 1.5rem;
-      padding-right: 6px;
-    }
-    .archive-list ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .archive-item {
-      background: #0c1222cc;
-      backdrop-filter: blur(4px);
-      border-radius: 1.2rem;
-      padding: 0.6rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-      transition: all 0.15s;
-      border: 1px solid #29335630;
-      cursor: pointer;
-    }
-    .archive-item:hover {
-      background: #1a2340;
-      border-color: #6b85c0;
-    }
-    .archive-date {
-      font-family: monospace;
-      font-weight: 500;
-      background: #00000055;
-      padding: 0.2rem 0.7rem;
-      border-radius: 2rem;
-      font-size: 0.8rem;
-    }
-    .archive-title {
-      font-weight: 500;
-      flex: 2;
-      font-size: 0.95rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .load-archive-btn {
-      text-align: center;
-      margin-top: 1.2rem;
-    }
-    .btn-starlight {
-      background: transparent;
-      border: 1px solid #6f8fd0;
-      color: #cfdfff;
-      padding: 0.5rem 1.6rem;
-      border-radius: 2rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.2s;
-      font-size: 0.8rem;
-    }
-    .btn-starlight:hover {
-      background: #2b385b;
-      border-color: #9bb6f0;
-    }
-    footer {
-      text-align: center;
-      margin-top: 3rem;
-      font-size: 0.75rem;
-      color: #7c89aa;
-    }
-    ::-webkit-scrollbar {
-      width: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #131c2c;
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #3f5182;
-      border-radius: 10px;
-    }
-    @media (max-width: 600px) {
-      .container { padding: 1rem; }
-      .daily-card { padding: 1.3rem; }
-      h1 { font-size: 1.9rem; }
-      .archive-item { flex-direction: column; align-items: flex-start; }
-      .archive-title { white-space: normal; }
-    }
-  </style>
+/* ── LEFT SIDEBAR ── */
+.sidebar-left { display: flex; flex-direction: column; gap: 1rem; }
+
+.date-big {
+  font-family: var(--cond); font-size: 3.2rem; font-weight: 700;
+  line-height: 1; color: var(--gold2); letter-spacing: -0.01em;
+}
+.date-month-year {
+  font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--text3); margin-top: 4px;
+}
+.verse-ref {
+  margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--border);
+  font-size: 0.65rem; color: var(--accent2); letter-spacing: 0.1em;
+  font-family: var(--mono);
+}
+.stat-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.3rem 0; border-bottom: 1px solid var(--border); font-size: 0.7rem;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-key { color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.58rem; }
+.stat-val { color: var(--gold); font-weight: 500; }
+
+/* ── MAIN DEVOTIONAL ── */
+.main-col { display: flex; flex-direction: column; gap: 1rem; }
+
+.devot-eyebrow {
+  font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.22em;
+  color: var(--accent2); font-weight: 600; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.devot-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.devot-title {
+  font-family: var(--cond); font-size: 2.1rem; font-weight: 700;
+  line-height: 1.1; color: var(--gold2); letter-spacing: 0.01em;
+  text-transform: uppercase; margin-bottom: 1.2rem;
+}
+.scripture-block {
+  border-left: 3px solid var(--accent);
+  padding: 0.8rem 1rem;
+  background: rgba(74,127,255,0.06);
+  border-radius: 0 4px 4px 0;
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 1.2rem;
+  font-style: italic;
+}
+.scripture-ref {
+  font-style: normal; font-size: 0.58rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--accent2); margin-top: 4px;
+}
+.section-head {
+  font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--text3); font-weight: 700; margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 6px;
+}
+.section-head::before { content: '//'; color: var(--accent); font-size: 0.6rem; }
+.body-text {
+  font-size: 0.82rem; line-height: 1.75; color: var(--text);
+  margin-bottom: 1.2rem;
+}
+.prayer-block {
+  background: rgba(126,184,255,0.05);
+  border: 1px solid rgba(126,184,255,0.15);
+  border-radius: 4px;
+  padding: 1rem;
+}
+.loader-state {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.7rem; color: var(--text3); padding: 2rem 1.5rem;
+}
+.spinner { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── RIGHT SIDEBAR ── */
+.sidebar-right { display: flex; flex-direction: column; gap: 1rem; }
+
+.archive-search { display: flex; border-bottom: 1px solid var(--border); }
+.archive-search input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--text); font-family: var(--mono); font-size: 0.65rem;
+  padding: 0.5rem 0.8rem; letter-spacing: 0.05em;
+}
+.archive-search input::placeholder { color: var(--text3); }
+.archive-search button {
+  background: transparent; border: none; border-left: 1px solid var(--border);
+  color: var(--text3); cursor: pointer; padding: 0 0.7rem;
+  font-size: 0.65rem; transition: color 0.2s;
+}
+.archive-search button:hover { color: var(--accent2); }
+
+.archive-list-inner { max-height: 340px; overflow-y: auto; padding: 0.4rem 0; }
+.archive-entry {
+  padding: 0.45rem 1rem;
+  display: flex; flex-direction: column; gap: 2px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background 0.15s; font-size: 0.65rem;
+}
+.archive-entry:last-child { border-bottom: none; }
+.archive-entry:hover { background: rgba(74,127,255,0.07); }
+.adate { color: var(--accent); font-size: 0.55rem; letter-spacing: 0.1em; }
+.adot {
+  display: inline-block; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--pip); margin-right: 5px; vertical-align: middle;
+}
+.atitle { color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.archive-footer {
+  padding: 0.5rem 1rem; border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end;
+}
+.btn-refresh {
+  background: transparent; border: 1px solid var(--border-hi);
+  color: var(--text3); font-family: var(--mono); font-size: 0.55rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 0.3rem 0.8rem; cursor: pointer; transition: all 0.2s; border-radius: 2px;
+}
+.btn-refresh:hover { border-color: var(--accent); color: var(--accent2); }
+
+.support-link {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  color: var(--gold); font-size: 0.62rem; letter-spacing: 0.12em;
+  text-transform: uppercase; text-decoration: none;
+  padding: 0.5rem; border: 1px solid rgba(232,201,122,0.2);
+  border-radius: 2px; transition: all 0.2s;
+}
+.support-link:hover { background: rgba(232,201,122,0.07); border-color: rgba(232,201,122,0.45); }
+
+.error-state {
+  padding: 1.5rem; font-size: 0.72rem; color: var(--text3);
+  line-height: 1.6; text-align: center;
+}
+.error-state i { color: var(--accent); font-size: 1.1rem; margin-bottom: 0.5rem; display: block; }
+
+/* ── FOOTER ── */
+.site-footer {
+  margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.footer-verse { font-size: 0.6rem; color: var(--text3); letter-spacing: 0.08em; font-style: italic; }
+.footer-brand {
+  font-family: var(--cond); font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3);
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+</style>
 </head>
 <body>
-<div class="star-bg"></div>
-<div class="container">
-  <div class="hero">
-    <div class="logo">
-      <i class="fas fa-star-of-life"></i>
-      <span>OurNightSky.Us</span>
+<div class="stars"></div>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="site-header">
+    <div class="logo-block">
+      <div class="logo-wordmark">OurNightSky</div>
+      <div class="logo-tag">Celestial Devotionals</div>
     </div>
-    <div class="tagline">✦ the heavens declare His glory ✦</div>
+    <div class="header-right">
+      <div class="pip-row">
+        <div class="pip"></div>
+        <div class="pip"></div>
+        <div class="pip"></div>
+      </div>
+      <div class="section-label">ournightsky.us</div>
+    </div>
   </div>
 
-  <!-- Daily devotional section -->
-  <div id="dailyDevotional">
-    <div class="loader" id="dailyLoader"><i class="fas fa-spinner fa-pulse"></i> Loading today's meditation...</div>
-    <div id="dailyContent"></div>
-  </div>
+  <!-- THREE COLUMNS -->
+  <div class="three-col">
 
-  <!-- Archive panel -->
-  <div class="archive-section">
-    <div class="archive-header">
-      <h2><i class="fas fa-moon"></i> Celestial archive</h2>
-      <div class="search-wrap">
-        <input type="text" id="archiveSearch" placeholder="Search by date or word..." autocomplete="off">
-        <button id="searchBtn"><i class="fas fa-search"></i></button>
+    <!-- LEFT: Date + Stats -->
+    <div class="sidebar-left">
+      <div class="panel">
+        <div class="panel-header"><div class="pip"></div>TODAY</div>
+        <div style="padding: 1rem 1rem 0.8rem;">
+          <div class="date-big" id="dayNum">--</div>
+          <div class="date-month-year" id="monthYear">--- ----</div>
+          <div class="verse-ref">PSALM 19:1</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div class="pip"></div>CELESTIAL INDEX</div>
+        <div style="padding: 0.4rem 1rem 0.6rem;">
+          <div class="stat-row">
+            <span class="stat-key">Moon Phase</span>
+            <span class="stat-val" id="moonPhase">--</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-key">Feed Status</span>
+            <span class="stat-val">LIVE</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-key">Archive</span>
+            <span class="stat-val" id="archiveCount">...</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-key">Updated</span>
+            <span class="stat-val">DAILY</span>
+          </div>
+        </div>
       </div>
     </div>
-    <div id="archiveListContainer">
-      <div class="loader" style="padding: 1rem;"><i class="fas fa-cloud-moon"></i> Loading archive index...</div>
+
+    <!-- CENTER: Devotional -->
+    <div class="main-col">
+      <div class="panel" style="padding: 1.5rem;" id="devotionalPanel">
+        <div class="loader-state">
+          <i class="fas fa-circle-notch spinner"></i>&nbsp;Loading today's meditation...
+        </div>
+      </div>
     </div>
-    <div class="load-archive-btn">
-      <button id="refreshArchiveBtn" class="btn-starlight"><i class="fas fa-sync-alt"></i> Refresh archive</button>
+
+    <!-- RIGHT: Archive + Support -->
+    <div class="sidebar-right">
+      <div class="panel" style="overflow: hidden;">
+        <div class="panel-header"><div class="pip" style="background: var(--gold);"></div>ARCHIVE</div>
+        <div class="archive-search">
+          <input type="text" id="archiveSearch" placeholder="search date or word..." autocomplete="off">
+          <button id="searchBtn"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="archive-list-inner" id="archiveList">
+          <div class="loader-state" style="padding: 1rem;">
+            <i class="fas fa-circle-notch spinner"></i>&nbsp;Loading...
+          </div>
+        </div>
+        <div class="archive-footer">
+          <button class="btn-refresh" id="refreshBtn"><i class="fas fa-sync-alt"></i>&nbsp;Refresh</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div class="pip" style="background: var(--gold);"></div>SUPPORT</div>
+        <div style="padding: 0.8rem 1rem 0.8rem;">
+          <a href="https://buymeacoffee.com/ournightsky" class="support-link" target="_blank" rel="noopener">
+            <i class="fas fa-mug-hot"></i>&nbsp;Buy Me a Coffee
+          </a>
+          <div style="font-size: 0.55rem; color: var(--text3); margin-top: 0.5rem; letter-spacing: 0.08em; text-align: center;">
+            Keep the stars shining
+          </div>
+        </div>
+      </div>
     </div>
+
+  </div><!-- /three-col -->
+
+  <div class="site-footer">
+    <div class="footer-verse">"The heavens declare the glory of God" — Psalm 19:1</div>
+    <div class="footer-brand">OurNightSky.Us</div>
   </div>
-  <footer>
-    <p>“The heavens declare the glory of God” — Psalm 19:1<br>Daily devotionals · every night under His sky</p>
-  </footer>
 </div>
 
 <script>
-  // ---------- CONFIGURATION ----------
-  // Base GitHub raw URL for the devotionals folder (raw content)
-  const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/NAGOHUSA/OurNightSky_Devotionals/main/devotionals/';
-  // GitHub API to list directory contents (using GitHub's public api)
-  const GITHUB_API_URL = 'https://api.github.com/repos/NAGOHUSA/OurNightSky_Devotionals/contents/devotionals';
-  
-  // cache for archive file list (list of json filenames with metadata)
-  let archiveFilesCache = [];        // array of { name, dateObj, titlePreview? }
-  let allDevotionalsData = new Map(); // optional: store fetched devotional data if needed for search (lazy)
-  
-  // DOM elements
-  const dailyLoader = document.getElementById('dailyLoader');
-  const dailyContentDiv = document.getElementById('dailyContent');
-  const archiveContainer = document.getElementById('archiveListContainer');
-  const searchInput = document.getElementById('archiveSearch');
-  const searchBtn = document.getElementById('searchBtn');
-  const refreshBtn = document.getElementById('refreshArchiveBtn');
+  // ---------- CONFIG ----------
+  const GITHUB_RAW = 'https://raw.githubusercontent.com/NAGOHUSA/OurNightSky_Devotionals/main/devotionals/';
+  const GITHUB_API = 'https://api.github.com/repos/NAGOHUSA/OurNightSky_Devotionals/contents/devotionals';
 
-  // Helper: format YYYY-MM-DD from filename
-  function extractDateFromFilename(filename) {
-    if (!filename || !filename.endsWith('.json')) return null;
-    const datePart = filename.replace('.json', '');
-    // validate YYYY-MM-DD format
-    if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return datePart;
-    return null;
+  let archiveCache = [];
+
+  // ---------- DATE DISPLAY ----------
+  function formatDay() {
+    const d = new Date();
+    document.getElementById('dayNum').textContent = String(d.getDate()).padStart(2, '0');
+    document.getElementById('monthYear').textContent =
+      d.toLocaleDateString('en-US', { month: 'long' }).toUpperCase() + ' ' + d.getFullYear();
   }
 
-  // fetch devotional JSON by filename (date string)
-  async function fetchDevotionalByDate(dateStr) {
-    try {
-      const url = `${GITHUB_RAW_BASE}${dateStr}.json`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      console.warn(`Failed to load ${dateStr}:`, err);
-      return null;
-    }
+  // ---------- MOON PHASE (approximate) ----------
+  function moonPhaseCalc() {
+    const phases = ['NEW MOON','WAXING CRS','FIRST QTR','WAXING GIB','FULL MOON','WANING GIB','LAST QTR','WANING CRS'];
+    const d = new Date();
+    const ref = new Date('2000-01-06');
+    const cycle = ((d - ref) / (1000 * 60 * 60 * 24)) % 29.53;
+    return phases[Math.floor(cycle / 29.53 * 8)] || 'CRESCENT';
   }
 
-  // Render daily devotional card into DOM
-  function renderDevotional(devotional, dateStr) {
-    if (!devotional) {
-      dailyContentDiv.innerHTML = `<div class="error-box"><i class="fas fa-sad-tear"></i> Today’s devotional is not yet available. <br> Please check again later or explore the archive.</div>`;
+  // ---------- HTML ESCAPE ----------
+  function esc(s) {
+    if (!s) return '';
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // ---------- RENDER DEVOTIONAL ----------
+  function renderDevotional(data, dateStr) {
+    const panel = document.getElementById('devotionalPanel');
+    if (!data) {
+      panel.innerHTML = `
+        <div class="error-state">
+          <i class="fas fa-moon"></i>
+          Today's devotional is being prepared.<br>
+          Explore the archive while you wait.
+        </div>`;
       return;
     }
-    // extract fields (support different possible key variations from your JSON sample)
-    const title = devotional.title || devotional.content_markdown?.split('\n')[0]?.replace('#', '').trim() || 'Heavenly Reflection';
-    const scripture = devotional.scripture || (devotional.content_markdown?.match(/\*\*Scripture\*\*:\s*(.*?)\n/i) ? devotional.content_markdown.match(/\*\*Scripture\*\*:\s*(.*?)\n/i)[1] : 'Psalm 19:1');
-    let reflectionText = devotional.reflection || '';
-    let prayerText = devotional.prayer || '';
-    // if content_markdown exists and fields missing, try parse markdown
-    if ((!reflectionText || !prayerText) && devotional.content_markdown) {
-      const md = devotional.content_markdown;
-      const reflectionMatch = md.match(/## Reflection\n([\s\S]*?)(?=\n## |$)/i);
-      if (reflectionMatch) reflectionText = reflectionMatch[1].trim();
-      const prayerMatch = md.match(/## Prayer\n([\s\S]*?)$/i);
-      if (prayerMatch) prayerText = prayerMatch[1].trim();
-      if (!scripture && md.includes('## Scripture')) {
-        const scrMatch = md.match(/## Scripture\n([\s\S]*?)(?=\n## |$)/i);
-        if (scrMatch) var scrVal = scrMatch[1].trim();
-        if (scrVal) var dynamicScripture = scrVal;
+
+    // Support both flat fields and content_markdown fallback
+    let title = data.title || '';
+    let scripture = data.scripture || '';
+    let reflection = data.reflection || '';
+    let prayer = data.prayer || '';
+
+    if (data.content_markdown) {
+      const md = data.content_markdown;
+      if (!title) title = (md.split('\n')[0] || '').replace(/^#+\s*/, '').trim();
+      if (!scripture) {
+        const m = md.match(/## Scripture\n([\s\S]*?)(?=\n## |$)/i);
+        if (m) scripture = m[1].trim();
+      }
+      if (!reflection) {
+        const m = md.match(/## Reflection\n([\s\S]*?)(?=\n## |$)/i);
+        if (m) reflection = m[1].trim();
+      }
+      if (!prayer) {
+        const m = md.match(/## Prayer\n([\s\S]*?)$/i);
+        if (m) prayer = m[1].trim();
       }
     }
-    const finalScripture = dynamicScripture || scripture;
-    const displayDate = dateStr ? new Date(dateStr + 'T12:00:00').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'Today';
-    
-    const html = `
-      <div class="daily-card">
-        <div class="devotional-date"><i class="far fa-calendar-alt"></i> ${displayDate}</div>
-        <h1>${escapeHtml(title)}</h1>
-        <div class="scripture"><i class="fas fa-feather-alt"></i> “${escapeHtml(finalScripture)}”</div>
-        <div class="reflection">
-          <strong><i class="fas fa-glasses"></i> Reflection</strong>
-          <p>${escapeHtml(reflectionText).replace(/\n/g, '<br>')}</p>
-        </div>
-        <div class="prayer">
-          <strong><i class="fas fa-hands-praying"></i> Prayer</strong>
-          <p>${escapeHtml(prayerText).replace(/\n/g, '<br>')}</p>
-        </div>
-      </div>
+
+    const displayDate = new Date(dateStr + 'T12:00:00')
+      .toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+      .toUpperCase();
+
+    panel.innerHTML = `
+      <div class="devot-eyebrow">${displayDate}</div>
+      <div class="devot-title">${esc(title || 'Heavenly Reflection')}</div>
+      ${scripture ? `
+        <div class="scripture-block">
+          <em>${esc(scripture)}</em>
+          <div class="scripture-ref">— Scripture</div>
+        </div>` : ''}
+      ${reflection ? `
+        <div class="section-head">REFLECTION</div>
+        <div class="body-text">${esc(reflection).replace(/\n/g, '<br>')}</div>` : ''}
+      ${prayer ? `
+        <div class="prayer-block">
+          <div class="section-head">PRAYER</div>
+          <div class="body-text" style="margin-bottom: 0;">${esc(prayer).replace(/\n/g, '<br>')}</div>
+        </div>` : ''}
     `;
-    dailyContentDiv.innerHTML = html;
   }
 
-  // Simple escape to avoid injection
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-      return c;
-    });
-  }
-
-  // Load today's devotional: get current date in YYYY-MM-DD
-  async function loadTodayDevotional() {
-    dailyLoader.style.display = 'block';
-    dailyContentDiv.innerHTML = '';
-    const today = new Date().toISOString().slice(0,10); // 2026-04-30 format
+  // ---------- LOAD TODAY ----------
+  async function loadToday() {
+    const today = new Date().toISOString().slice(0, 10);
     try {
-      const devotional = await fetchDevotionalByDate(today);
-      if (devotional) {
-        renderDevotional(devotional, today);
-      } else {
-        // fallback: try to show generic message or use the sample (but we want archive still works)
-        dailyContentDiv.innerHTML = `<div class="error-box"><i class="fas fa-cloud-moon"></i> Today's devotional is being prepared. Meanwhile, journey through our archive of heavenly reflections.</div>`;
-      }
-    } catch (err) {
-      dailyContentDiv.innerHTML = `<div class="error-box">Unable to fetch today's word. <br>But God's glory still shines. Please check archive.</div>`;
-    } finally {
-      dailyLoader.style.display = 'none';
+      const r = await fetch(GITHUB_RAW + today + '.json');
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      renderDevotional(await r.json(), today);
+    } catch {
+      renderDevotional(null, today);
     }
   }
 
-  // FETCH ARCHIVE LIST from GitHub API
-  async function fetchArchiveFileList() {
+  // ---------- LOAD ARCHIVE INDEX ----------
+  async function loadArchive() {
     try {
-      const response = await fetch(GITHUB_API_URL);
-      if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
-      const files = await response.json();
+      const r = await fetch(GITHUB_API);
+      if (!r.ok) throw new Error(`GitHub API ${r.status}`);
+      const files = await r.json();
       if (!Array.isArray(files)) throw new Error('Invalid response');
-      // filter only .json files that match date format
-      const jsonFiles = files.filter(file => file.name.endsWith('.json') && extractDateFromFilename(file.name) !== null);
-      // sort descending by date (newest first)
-      jsonFiles.sort((a,b) => {
-        const dateA = extractDateFromFilename(a.name);
-        const dateB = extractDateFromFilename(b.name);
-        if (!dateA || !dateB) return 0;
-        return dateB.localeCompare(dateA);
-      });
-      // map to simpler structure
-      archiveFilesCache = jsonFiles.map(file => ({
-        name: file.name,
-        date: extractDateFromFilename(file.name),
-        downloadUrl: file.download_url || `${GITHUB_RAW_BASE}${file.name}`,
-        titlePreview: null   // we may load later if needed, but for search we fetch on-demand
-      }));
-      return archiveFilesCache;
+      archiveCache = files
+        .filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f.name))
+        .sort((a, b) => b.name.localeCompare(a.name))
+        .map(f => ({ date: f.name.replace('.json', ''), url: f.download_url || (GITHUB_RAW + f.name) }));
+      document.getElementById('archiveCount').textContent = archiveCache.length;
+      renderArchiveList('');
     } catch (err) {
-      console.error('Failed to fetch file list', err);
-      archiveContainer.innerHTML = `<div class="error-box"><i class="fas fa-ban"></i> Could not load archive index. Please check network or refresh.</div>`;
-      return [];
+      console.error('Archive load failed:', err);
+      document.getElementById('archiveList').innerHTML =
+        '<div class="error-state" style="padding: 0.8rem; font-size: 0.62rem;">Could not load archive index.</div>';
     }
   }
 
-  // render archive list (with optional filter text)
-  async function renderArchiveList(filterText = '') {
-    if (archiveFilesCache.length === 0) {
-      archiveContainer.innerHTML = `<div class="loader"><i class="fas fa-spinner fa-pulse"></i> Loading celestial archive...</div>`;
-      const files = await fetchArchiveFileList();
-      if (files.length === 0) {
-        archiveContainer.innerHTML = `<div class="error-box">No devotionals found in archive.</div>`;
-        return;
-      }
-    }
-    let filteredFiles = [...archiveFilesCache];
-    const lowerFilter = filterText.toLowerCase().trim();
-    if (lowerFilter !== '') {
-      // filter by date string or we need to fetch title? we do async filter that requires fetching titles? 
-      // For simplicity we filter by date first, then if user searches a word we need to filter after fetching content? 
-      // Better: if filterText, we filter by date matches, otherwise we later when clicking we allow full search.
-      // But we also want to fetch for titles that include keyword. We'll implement advanced: if filter contains letters,
-      // we show loading and fetch titles for visible set (filtered by date first). For user experience, we do date match first
-      // then for non-date filter (words) we do dynamic search over a limited set (first 80 or show all with indicator)
-      // To keep robust, perform filter on existing archive by date string and if no match, we attempt to fetch titles on first 50?
-      // Improving: if filter doesn't match YYYY-MM-DD pattern, we fetch content for those items in background.
-      const isDateFilter = /^\d{4}-\d{2}-\d{2}$/.test(lowerFilter);
-      if (isDateFilter) {
-        filteredFiles = filteredFiles.filter(f => f.date === lowerFilter);
-      } else {
-        // text search across titles: we need to preload some meta. we show a loader and lazy fetch titles on demand.
-        archiveContainer.innerHTML = `<div class="loader"><i class="fas fa-search"></i> Searching through the stars...<br><span style="font-size:0.8rem;">Loading devotional titles for matching...</span></div>`;
-        // fetch titles for all files (or until we have data)
-        const filesWithTitles = await enrichTitlesForFiles(filteredFiles);
-        const searchLower = lowerFilter;
-        const matched = filesWithTitles.filter(f => 
-          f.date.includes(searchLower) || (f.titlePreview && f.titlePreview.toLowerCase().includes(searchLower))
-        );
-        renderArchiveListItems(matched);
-        return;
-      }
-    }
-    renderArchiveListItems(filteredFiles);
-  }
+  // ---------- RENDER ARCHIVE LIST ----------
+  function renderArchiveList(filter) {
+    const el = document.getElementById('archiveList');
+    const q = filter.toLowerCase().trim();
+    const items = q ? archiveCache.filter(f => f.date.includes(q)) : archiveCache;
 
-  async function enrichTitlesForFiles(files) {
-    // fetch only missing titles, but limit concurrency to 5 at a time
-    const results = [];
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      if (file.titlePreview) {
-        results.push(file);
-        continue;
-      }
-      try {
-        const resp = await fetch(file.downloadUrl);
-        if (resp.ok) {
-          const data = await resp.json();
-          let title = data.title || '';
-          if (!title && data.content_markdown) {
-            const firstLine = data.content_markdown.split('\n')[0];
-            title = firstLine.replace(/^#+\s*/, '').trim();
-          }
-          file.titlePreview = title || `Devotional ${file.date}`;
-        } else {
-          file.titlePreview = `Meditation ${file.date}`;
-        }
-      } catch(e) {
-        file.titlePreview = `Reflection ${file.date}`;
-      }
-      results.push(file);
-      // small delay to avoid rate limiting
-      await new Promise(r => setTimeout(r, 50));
-    }
-    return results;
-  }
-
-  function renderArchiveListItems(files) {
-    if (!files.length) {
-      archiveContainer.innerHTML = `<div class="error-box">✨ No devotionals match your search. Try another date or word.</div>`;
+    if (!items.length) {
+      el.innerHTML = '<div class="error-state" style="padding: 0.8rem; font-size: 0.62rem;">No entries found.</div>';
       return;
     }
-    const ul = document.createElement('ul');
-    ul.style.listStyle = 'none';
-    for (const file of files) {
-      const li = document.createElement('li');
-      li.className = 'archive-item';
-      const displayTitle = file.titlePreview || (file.date + ' meditation');
-      li.innerHTML = `
-        <span class="archive-date"><i class="far fa-calendar"></i> ${file.date}</span>
-        <span class="archive-title">📖 ${escapeHtml(displayTitle.substring(0, 70))}</span>
-        <button class="btn-starlight load-archive-entry" data-date="${file.date}" style="font-size:0.75rem; background:#1f2a44;">Read</button>
-      `;
-      ul.appendChild(li);
-    }
-    archiveContainer.innerHTML = '';
-    archiveContainer.appendChild(ul);
-    // attach event listeners to each read button
-    document.querySelectorAll('.load-archive-entry').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const date = btn.getAttribute('data-date');
-        if (!date) return;
-        dailyLoader.style.display = 'block';
-        dailyContentDiv.innerHTML = '';
-        const devotional = await fetchDevotionalByDate(date);
-        dailyLoader.style.display = 'none';
-        if (devotional) {
-          renderDevotional(devotional, date);
-          // scroll to daily devotional
-          document.getElementById('dailyDevotional').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-          dailyContentDiv.innerHTML = `<div class="error-box">Unable to load devotional for ${date}.</div>`;
+
+    el.innerHTML = items.slice(0, 80).map(f => `
+      <div class="archive-entry" data-date="${f.date}" data-url="${esc(f.url)}">
+        <div class="adate"><span class="adot"></span>${f.date}</div>
+        <div class="atitle">Celestial Reflection</div>
+      </div>
+    `).join('');
+
+    el.querySelectorAll('.archive-entry').forEach(entry => {
+      entry.addEventListener('click', async () => {
+        const date = entry.getAttribute('data-date');
+        const url  = entry.getAttribute('data-url');
+        const panel = document.getElementById('devotionalPanel');
+        panel.innerHTML = `<div class="loader-state"><i class="fas fa-circle-notch spinner"></i>&nbsp;Loading ${date}...</div>`;
+        try {
+          const r = await fetch(url);
+          if (!r.ok) throw new Error();
+          renderDevotional(await r.json(), date);
+        } catch {
+          renderDevotional(null, date);
         }
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
   }
 
-  // refresh archive and clear cache
-  async function refreshArchive() {
-    archiveFilesCache = [];
-    archiveContainer.innerHTML = `<div class="loader"><i class="fas fa-spinner fa-pulse"></i> refreshing celestial records...</div>`;
-    await fetchArchiveFileList();
-    await renderArchiveList('');
-  }
-
-  // on search input
+  // ---------- SEARCH ----------
   function handleSearch() {
-    const query = searchInput.value.trim();
-    renderArchiveList(query);
+    renderArchiveList(document.getElementById('archiveSearch').value);
   }
 
-  // initialization
-  async function init() {
-    await loadTodayDevotional();
-    await fetchArchiveFileList();
-    await renderArchiveList('');
-    // bind events
-    searchBtn.addEventListener('click', handleSearch);
-    refreshBtn.addEventListener('click', refreshArchive);
-    searchInput.addEventListener('keypress', (e) => {
+  // ---------- REFRESH ----------
+  function refreshArchive() {
+    archiveCache = [];
+    document.getElementById('archiveList').innerHTML =
+      '<div class="loader-state" style="padding:1rem;"><i class="fas fa-circle-notch spinner"></i>&nbsp;Refreshing...</div>';
+    loadArchive();
+  }
+
+  // ---------- INIT ----------
+  function init() {
+    formatDay();
+    document.getElementById('moonPhase').textContent = moonPhaseCalc();
+    loadToday();
+    loadArchive();
+    document.getElementById('searchBtn').addEventListener('click', handleSearch);
+    document.getElementById('refreshBtn').addEventListener('click', refreshArchive);
+    document.getElementById('archiveSearch').addEventListener('keydown', e => {
       if (e.key === 'Enter') handleSearch();
     });
   }
